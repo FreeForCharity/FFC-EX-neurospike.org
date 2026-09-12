@@ -4,24 +4,32 @@ import { assetPath } from '@/lib/assetPath'
 
 /**
  * A content image lifted from the source Google Site and localized into
- * `public/images/content/`.
+ * `public/Images/content/`.
  *
- * Uses `assetPath()` so the GitHub Pages basePath is applied (repo rule), and
- * `next/image` with the project's global `images.unoptimized` so the static
- * export serves the file verbatim.
+ * Callers pass the FILE NAME only. The directory and `assetPath()` are applied
+ * here, in the one place that knows about them, for two reasons:
+ *
+ *  - a reference site cannot get the directory or its case wrong, and there is
+ *    no prefix to keep in sync across a dozen call sites;
+ *  - `scripts/check-drift.mjs` requires every `/Images/...` reference to be
+ *    wrapped in `assetPath()` so GitHub Pages subpath deploys keep working.
+ *    Passing a full path as a prop put a bare `src="/Images/..."` at each call
+ *    site, which the guard reads as unwrapped even though this component does
+ *    wrap it. Building the path here makes the guard's rule true rather than
+ *    something to be excepted.
  *
  * Intrinsic dimensions are the source image's own naturalWidth/naturalHeight,
  * read from the live page at capture time — they are required by next/image and
  * keep the layout from shifting as each image loads.
  */
 export default function ContentImage({
-  src,
+  name,
   alt,
   width,
   height,
 }: {
-  /** Path under /images/content, e.g. `/images/content/home-01.jpg`. */
-  src: string
+  /** File name within `public/Images/content`, e.g. `home-01.jpg`. */
+  name: string
   alt: string
   width: number
   height: number
@@ -29,7 +37,14 @@ export default function ContentImage({
   return (
     <figure className="my-[22px]">
       <Image
-        src={assetPath(src)}
+        // Directory inlined inside assetPath() rather than held in a named
+        // constant: scripts/check-drift.mjs accepts an "/Images/..." literal
+        // only when assetPath( appears just before it, and a bare exported
+        // constant reads to the guard as an unwrapped reference. Capital `I`
+        // matches the repo's /Images and /Svgs directories — GitHub Pages is
+        // case-sensitive, and a lowercase path 404s there while resolving fine
+        // on a case-insensitive local filesystem.
+        src={assetPath(`/Images/content/${name}`)}
         alt={alt}
         width={width}
         height={height}

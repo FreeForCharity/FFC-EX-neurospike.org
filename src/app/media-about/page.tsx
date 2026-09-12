@@ -48,19 +48,19 @@ export default function MediaAbout() {
         </li>
       </UL>
       <ContentImage
-        src="/images/content/media-01.jpg"
+        name="media-01.jpg"
         alt="Robert H. Lee, media appearance"
         width={404}
         height={413}
       />
       <ContentImage
-        src="/images/content/media-02.png"
+        name="media-02.png"
         alt="Press coverage featuring Robert H. Lee"
         width={902}
         height={1420}
       />
       <ContentImage
-        src="/images/content/media-03.jpg"
+        name="media-03.jpg"
         alt="Press coverage featuring Robert H. Lee"
         width={1280}
         height={1707}

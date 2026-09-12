@@ -18,7 +18,7 @@ export default function OtherResearchCnagi() {
       <Lede>CNAGI &amp; AI Theory of Mind</Lede>
 
       <ContentImage
-        src="/images/content/cnagi-01.jpg"
+        name="cnagi-01.jpg"
         alt="CNAGI and AI Theory of Mind overview"
         width={402}
         height={642}
@@ -107,7 +107,7 @@ export default function OtherResearchCnagi() {
       <H2 id="sample-code">Sample code</H2>
       <P>LLM Theory of Mind Subtraction Test — see more here.</P>
       <ContentImage
-        src="/images/content/cnagi-02.png"
+        name="cnagi-02.png"
         alt="LLM Theory of Mind subtraction test — sample code"
         width={1260}
         height={1118}
@@ -149,13 +149,13 @@ export default function OtherResearchCnagi() {
         algorithm:
       </P>
       <ContentImage
-        src="/images/content/cnagi-03.png"
+        name="cnagi-03.png"
         alt="The SP calculation expressed as a formula"
         width={826}
         height={114}
       />
       <ContentImage
-        src="/images/content/cnagi-04.png"
+        name="cnagi-04.png"
         alt="Worked SP calculation and results table"
         width={1280}
         height={895}
@@ -250,19 +250,19 @@ export default function OtherResearchCnagi() {
       </UL>
 
       <ContentImage
-        src="/images/content/cnagi-05.png"
+        name="cnagi-05.png"
         alt="Inhibitory control subtraction, expressed as a formula"
         width={838}
         height={89}
       />
       <ContentImage
-        src="/images/content/cnagi-06.png"
+        name="cnagi-06.png"
         alt="Prelec SP algorithm mapped to transformer layers"
         width={1280}
         height={1231}
       />
       <ContentImage
-        src="/images/content/cnagi-07.png"
+        name="cnagi-07.png"
         alt="The grand analogy: Sally-Anne, Prelec and DoLa side by side"
         width={1280}
         height={1310}

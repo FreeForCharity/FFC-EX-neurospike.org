@@ -32,19 +32,19 @@ export default function Home() {
         <li>Knowledge Node Maps</li>
       </UL>
       <ContentImage
-        src="/images/content/home-01.jpg"
+        name="home-01.jpg"
         alt="Neurospike FRO executive summary visual"
         width={1082}
         height={817}
       />
       <ContentImage
-        src="/images/content/home-02.jpg"
+        name="home-02.jpg"
         alt="Neurospike FRO supporting figure"
         width={512}
         height={449}
       />
       <ContentImage
-        src="/images/content/home-03.jpg"
+        name="home-03.jpg"
         alt="Neurospike FRO supporting figure"
         width={481}
         height={425}
