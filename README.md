@@ -161,7 +161,11 @@ See [TESTING.md](./TESTING.md) for the full testing guide.
 
 ## Deployment
 
-- **Live Site**: [https://neurospike.org](https://neurospike.org)
+- **Live Site**: https://freeforcharity.github.io/FFC-EX-neurospike.org/ — the GitHub Pages
+  project address, which is where this site is served while `public/CNAME` does not exist.
+  `neurospike.org` is not registered yet (the `.org` registry answers NXDOMAIN), so there is
+  no zone to point at Pages. See the `url` comment in `src/lib/site.config.ts` for the
+  one-change cutover.
 - **GitHub Pages**: Automated via GitHub Actions on push to `main`
 - **Static export**: `output: 'export'` in `next.config.ts`
 

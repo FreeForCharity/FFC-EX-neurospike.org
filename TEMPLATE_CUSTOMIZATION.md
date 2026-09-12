@@ -54,11 +54,16 @@ charity's name, URL, contact email, social links, etc.
   policy — edit that page's content instead.
 - **GitHub Pages base path** — chosen automatically by the deploy workflow
   based on whether `public/CNAME` exists. No manual workflow edit required.
-- **GTM container ID** — lives in `src/lib/analytics.config.ts`. Two states are
-  supported and one is a trap: an **empty string** means "no container
-  provisioned yet" and renders no tag at all, which is the right value until
-  you have your own container. Leaving it as the template's `GTM-TQ5H8HPR`
-  sends your analytics to Free For Charity — replace it or empty it early.
+- **GTM container ID** — lives in
+  `src/lib/analytics.config.ts`. Leaving it as `GTM-TQ5H8HPR`
+  sends your analytics to Free For Charity — replace it early. Setting it to
+  the empty string is supported and means "no container yet": both GTM
+  components then render nothing, instead of emitting a tag that requests
+  `gtm.js?id=` and fails in the browser.
+- **Phone number** — `siteConfig.phone` may be left as two empty strings if
+  your charity publishes no phone number. The footer then omits the "Call Us
+  Today" block entirely. Do **not** put a placeholder there: it ships as a
+  `tel:` link that looks callable and dials nothing.
 - **E2E test expectations** — content-specific test values live in
   [`tests/test.config.ts`](./tests/test.config.ts); update them alongside your
   content edits.

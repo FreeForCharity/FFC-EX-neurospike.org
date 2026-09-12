@@ -25,8 +25,8 @@ export default function DonationPolicy() {
             Tax Deductibility
           </h2>
           <p>
-            NeuroSpike is a qualified 501(c)(3) public charity (EIN: 42-2753465). Donations are
-            tax-deductible to the full extent allowed by law.
+            {siteConfig.name} is a qualified 501(c)(3) public charity (EIN: {siteConfig.ein}).
+            Donations are tax-deductible to the full extent allowed by law.
           </p>
 
           <h2 className="font-[var(--font-faustina)] text-[32px] leading-[40px] mt-8 mb-4">
@@ -72,8 +72,8 @@ export default function DonationPolicy() {
           <p>For questions about donations or this policy, please contact us at:</p>
           <p>
             Email:{' '}
-            <a href="mailto:rlee@codex.stanford.edu" className="text-primary hover:underline">
-              rlee@codex.stanford.edu
+            <a href={`mailto:${siteConfig.contactEmail}`} className="text-primary hover:underline">
+              {siteConfig.contactEmail}
             </a>
           </p>
         </div>
