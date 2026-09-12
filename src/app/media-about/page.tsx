@@ -5,7 +5,7 @@ import { PageShell, PageTitle, H2, P, UL, A } from '@/components/content'
 import ContentImage from '@/components/content/ContentImage'
 
 export const metadata: Metadata = {
-  title: 'Media & About | Neurospike FRO',
+  title: 'Media & About',
   description:
     'About Robert H. Lee — deep tech investing, early-stage operations, academic publications and media appearances.',
   alternates: { canonical: siteUrl('/media-about') },

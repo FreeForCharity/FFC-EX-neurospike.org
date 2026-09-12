@@ -4,7 +4,7 @@ import { siteUrl } from '@/lib/site.config'
 import { PageShell, PageTitle, H2, H3, P, UL, A, Lede } from '@/components/content'
 
 export const metadata: Metadata = {
-  title: 'Org & Leadership | Neurospike FRO',
+  title: 'Org & Leadership',
   description:
     'NeuroSpike operates as a lean virtual biotech during Phase 0 and Phase 1, and is recruiting science advisors and consultants.',
   alternates: { canonical: siteUrl('/org-leadership') },

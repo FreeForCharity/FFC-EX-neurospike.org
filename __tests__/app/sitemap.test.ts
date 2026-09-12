@@ -1,9 +1,14 @@
 import type { Metadata } from 'next'
 import nextConfig from '../../next.config'
 import sitemap, { routes } from '../../src/app/sitemap'
-import { canonicalPath, siteUrl, trailingSlash } from '../../src/lib/site.config'
+import { metadata as rootPageMetadata } from '../../src/app/page'
+import { canonicalPath, siteConfig, siteUrl, trailingSlash } from '../../src/lib/site.config'
 import { siteMetadata } from '../../src/lib/siteMetadata'
 import { metadata as cookiePolicyMetadata } from '../../src/app/cookie-policy/page'
+import { metadata as mediaAboutMetadata } from '../../src/app/media-about/page'
+import { metadata as orgLeadershipMetadata } from '../../src/app/org-leadership/page'
+import { metadata as otherResearchCnagiMetadata } from '../../src/app/other-research-cnagi/page'
+import { metadata as substackyMetadata } from '../../src/app/substacky/page'
 import { metadata as donationPolicyMetadata } from '../../src/app/donation-policy/page'
 import { metadata as ffcDonationPolicyMetadata } from '../../src/app/free-for-charity-donation-policy/page'
 import { metadata as privacyPolicyMetadata } from '../../src/app/privacy-policy/page'
@@ -11,9 +16,17 @@ import { metadata as securityAcknowledgementsMetadata } from '../../src/app/secu
 import { metadata as termsOfServiceMetadata } from '../../src/app/terms-of-service/page'
 import { metadata as vulnerabilityDisclosureMetadata } from '../../src/app/vulnerability-disclosure-policy/page'
 
+// An arbitrary base path: these cases set NEXT_PUBLIC_BASE_PATH themselves, so
+// the value need only be a valid base path, not this repo's own project path.
+const TEST_BASE_PATH = '/Example-Project-Path'
+
 /** Metadata that owns the canonical tag for each sitemap route. */
 const metadataByRoute: Record<string, Metadata> = {
   '/': siteMetadata,
+  '/org-leadership': orgLeadershipMetadata,
+  '/other-research-cnagi': otherResearchCnagiMetadata,
+  '/media-about': mediaAboutMetadata,
+  '/substacky': substackyMetadata,
   '/privacy-policy': privacyPolicyMetadata,
   '/cookie-policy': cookiePolicyMetadata,
   '/terms-of-service': termsOfServiceMetadata,
@@ -50,20 +63,18 @@ describe('sitemap.xml generation', () => {
     delete process.env.NEXT_PUBLIC_BASE_PATH
     const result = sitemap()
     for (const entry of result) {
-      expect(entry.url).toContain('ffcworkingsite1.org')
+      expect(entry.url.startsWith(`${siteConfig.url}/`)).toBe(true)
     }
   })
 
   it('should include GitHub Pages base path in route URLs when configured', () => {
-    process.env.NEXT_PUBLIC_BASE_PATH = '/FFC-IN-Footer_Only_Template'
+    process.env.NEXT_PUBLIC_BASE_PATH = TEST_BASE_PATH
 
     const result = sitemap()
 
+    expect(result.find((entry) => entry.url.endsWith(`${TEST_BASE_PATH}/`))).toBeDefined()
     expect(
-      result.find((entry) => entry.url.endsWith('/FFC-IN-Footer_Only_Template/'))
-    ).toBeDefined()
-    expect(
-      result.find((entry) => entry.url.includes('/FFC-IN-Footer_Only_Template/privacy-policy'))
+      result.find((entry) => entry.url.includes(`${TEST_BASE_PATH}/privacy-policy`))
     ).toBeDefined()
   })
 
@@ -111,7 +122,7 @@ describe('sitemap URL shape matches the trailingSlash config', () => {
       expect(entry.url.endsWith('/')).toBe(canonicalPath(routes[index].path).endsWith('/'))
       // Belt and braces: siteUrl() is what we are asserting about, so also
       // check the raw string against the configured origin + served path.
-      expect(entry.url).toBe(`https://ffcworkingsite1.org${canonicalPath(routes[index].path)}`)
+      expect(entry.url).toBe(`${siteConfig.url}${canonicalPath(routes[index].path)}`)
     })
   })
 
@@ -120,20 +131,18 @@ describe('sitemap URL shape matches the trailingSlash config', () => {
 
     const [root] = sitemap()
 
-    expect(root.url).toBe('https://ffcworkingsite1.org/')
+    expect(root.url).toBe(`${siteConfig.url}/`)
     expect(root.url.endsWith('//')).toBe(false)
   })
 
   it('applies the same shape under the GitHub Pages base path', () => {
-    process.env.NEXT_PUBLIC_BASE_PATH = '/FFC-IN-Footer_Only_Template'
+    process.env.NEXT_PUBLIC_BASE_PATH = TEST_BASE_PATH
 
     const result = sitemap()
     const urls = result.map((entry) => entry.url)
 
-    expect(urls[0]).toBe('https://ffcworkingsite1.org/FFC-IN-Footer_Only_Template/')
-    expect(urls).toContain(
-      'https://ffcworkingsite1.org/FFC-IN-Footer_Only_Template/privacy-policy/'
-    )
+    expect(urls[0]).toBe(`${siteConfig.url}${TEST_BASE_PATH}/`)
+    expect(urls).toContain(`${siteConfig.url}${TEST_BASE_PATH}/privacy-policy/`)
     for (const url of urls) {
       expect(url.endsWith('/')).toBe(trailingSlash)
       expect(url).not.toMatch(/\/\/$/)
@@ -158,5 +167,50 @@ describe('sitemap URL shape matches the trailingSlash config', () => {
       expect(metadata).toBeDefined()
       expect(metadata.alternates?.canonical).toBe(siteUrl(route.path))
     }
+  })
+})
+
+/**
+ * The root layout sets `title.template = '%s | <site name>'`, which Next applies
+ * to every CHILD route segment (not to app/page.tsx, which shares the root
+ * segment with the layout and uses `title.default`).
+ *
+ * A child page whose own title already ends in the site name therefore renders
+ * it twice — `Privacy Policy | Acme | Acme`. That shipped in the template for
+ * every policy page and was invisible to the suite, because the old assertion
+ * was `title` CONTAINS the site name, which the doubled form satisfies.
+ */
+describe('page titles compose with the layout template without repeating the site name', () => {
+  const template = (siteMetadata.title as { template: string }).template
+
+  it('uses a template that appends the site name exactly once', () => {
+    expect(template).toContain('%s')
+    expect(template.split(siteConfig.name)).toHaveLength(2)
+  })
+
+  it.each(routes.filter((route) => route.path !== '/'))(
+    'composes a single site name for $path',
+    (route) => {
+      const metadata = metadataByRoute[route.path]
+      const pageTitle = metadata.title as string
+
+      expect(typeof pageTitle).toBe('string')
+      expect(pageTitle.length).toBeGreaterThan(0)
+
+      const rendered = template.replace('%s', pageTitle)
+      // Exactly one occurrence: splitting on it yields exactly two fragments.
+      expect(rendered.split(siteConfig.name)).toHaveLength(2)
+    }
+  )
+
+  it('gives the root route a complete standalone title', () => {
+    // app/page.tsx shares the root segment with the layout, so the template does
+    // NOT apply to it and the page must carry a full title of its own — the one
+    // place a page title is supposed to name the site.
+    const rootTitle = rootPageMetadata.title as string
+
+    expect(typeof rootTitle).toBe('string')
+    expect(rootTitle).toContain(siteConfig.name)
+    expect(rootTitle.split(siteConfig.name)).toHaveLength(2)
   })
 })

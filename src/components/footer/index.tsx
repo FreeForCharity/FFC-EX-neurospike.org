@@ -188,19 +188,28 @@ const Footer: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <Phone className="w-10 h-10 text-orange-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-[500] text-[22px]">Call Us Today</p>
-                <a
-                  href={`tel:${siteConfig.phone.tel}`}
-                  className="font-[500] text-[16px] hover:text-cyan-400 transition-colors"
-                  id="aria-font"
-                >
-                  {siteConfig.phone.display}
-                </a>
+            {/*
+              Rendered only when a number is actually configured. A charity with
+              no published phone number leaves siteConfig.phone empty, and an
+              empty `tel:` link is worse than an absent one: it still looks
+              callable to a sighted user and is still announced as a phone link
+              by a screen reader, but dials nothing.
+            */}
+            {siteConfig.phone.tel && (
+              <div className="flex items-start gap-3">
+                <Phone className="w-10 h-10 text-orange-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-[500] text-[22px]">Call Us Today</p>
+                  <a
+                    href={`tel:${siteConfig.phone.tel}`}
+                    className="font-[500] text-[16px] hover:text-cyan-400 transition-colors"
+                    id="aria-font"
+                  >
+                    {siteConfig.phone.display}
+                  </a>
+                </div>
               </div>
-            </div>
+            )}
 
             {siteConfig.addresses.map((address) => (
               <a

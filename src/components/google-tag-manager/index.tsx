@@ -14,10 +14,20 @@ import Script from 'next/script'
 // Do NOT name the template's container id in this comment: rebrand-check greps
 // the file for that literal, so quoting it here re-triggers the very warning
 // this change clears.
-const GTM_ID = ''
+export const GTM_ID = ''
 
-export default function GoogleTagManager() {
-  if (!GTM_ID) return null
+/**
+ * Both components take an optional `gtmId` that defaults to GTM_ID above.
+ * The prop exists so the test suite can exercise BOTH branches — configured and
+ * unconfigured — on any fork. Without it, a charity awaiting its container (the
+ * state every new site starts in) can only ever test the null branch, so the
+ * markup these components emit once a container IS provisioned would ship
+ * unverified. Production code passes nothing and gets the module constant.
+ */
+type GoogleTagManagerProps = { gtmId?: string }
+
+export default function GoogleTagManager({ gtmId = GTM_ID }: GoogleTagManagerProps = {}) {
+  if (!gtmId) return null
   return (
     <>
       {/* Google Tag Manager Script - loaded with lazyOnload for better performance */}
@@ -30,7 +40,7 @@ export default function GoogleTagManager() {
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
             j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${GTM_ID}');
+            })(window,document,'script','dataLayer','${gtmId}');
           `,
         }}
       />
@@ -39,12 +49,12 @@ export default function GoogleTagManager() {
 }
 
 // Export a component for the noscript iframe that goes in the body
-export function GoogleTagManagerNoScript() {
-  if (!GTM_ID) return null
+export function GoogleTagManagerNoScript({ gtmId = GTM_ID }: GoogleTagManagerProps = {}) {
+  if (!gtmId) return null
   return (
     <noscript>
       <iframe
-        src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+        src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
         height="0"
         width="0"
         style={{ display: 'none', visibility: 'hidden' }}

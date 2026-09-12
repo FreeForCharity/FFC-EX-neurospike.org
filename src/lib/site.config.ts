@@ -148,10 +148,12 @@ export const siteConfig: SiteConfig = {
   // the determination is "NeuroSpike"; `name` above is the site's own branding
   // ("Neurospike FRO"), which is what every page of the source site uses.
   ein: '42-2753465',
-  // LAUNCH BLOCKER -- still the one unknown. No phone number appears on the
-  // source site or on the Candid profile. `tel: 'PENDING'` is deliberately not
-  // dialable; a plausible-looking fake would route real callers somewhere real.
-  phone: { display: 'PENDING', tel: 'PENDING' },
+  // No phone number appears on the source site or on the Candid profile. Empty
+  // strings are the configured "this charity publishes no phone number" state:
+  // the footer omits the whole Call Us block rather than rendering a `tel:`
+  // link that looks callable and dials nothing. Fill both fields in if and when
+  // Neurospike publishes a number.
+  phone: { display: '', tel: '' },
   // From the Candid profile (the source website publishes no address).
   addresses: [
     {

@@ -5,7 +5,7 @@ import { PageShell, PageTitle, H2, H3, P, UL, A, Lede } from '@/components/conte
 import ContentImage from '@/components/content/ContentImage'
 
 export const metadata: Metadata = {
-  title: 'Other Research: CNAGI | Neurospike FRO',
+  title: 'Other Research: CNAGI',
   description:
     'Mechanistic Empathy: Decoding by Contrasting Layers (DoLa) as a Functional Analogue to Inhibitory Control in Theory of Mind.',
   alternates: { canonical: siteUrl('/other-research-cnagi') },

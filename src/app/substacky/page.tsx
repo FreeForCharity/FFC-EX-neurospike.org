@@ -4,7 +4,7 @@ import { siteUrl } from '@/lib/site.config'
 import { PageShell, PageTitle, H2, P, UL, A, Lede } from '@/components/content'
 
 export const metadata: Metadata = {
-  title: 'Substacky | Neurospike FRO',
+  title: 'Substacky',
   description:
     'Not Yet a Substack — essays and FAQs on techbio, science advocacy, deep tech product-market fit and early-stage fundraising.',
   alternates: { canonical: siteUrl('/substacky') },
