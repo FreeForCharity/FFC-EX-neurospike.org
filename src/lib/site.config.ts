@@ -111,62 +111,62 @@ export type SiteConfig = {
 }
 
 export const siteConfig: SiteConfig = {
-  name: 'Free For Charity',
-  tagline: 'Reduce Costs, Increase Impact',
+  name: 'Neurospike FRO',
+  tagline: 'A Focused Research Organization',
   description:
-    'Free For Charity connects students, professionals, and businesses with nonprofits to reduce costs and increase revenues—putting more resources back into their missions.',
+    'Neurospike is a Focused Research Organization studying Age-Related Fast-Spike Neuron Decline (FSND) as a unifying paradigm for age-related functional decline, developed translation-ready and in silico.',
   shortDescription:
-    'Connecting students, professionals, and businesses with nonprofits to reduce costs and increase revenues.',
-  url: 'https://ffcworkingsite1.org',
-  twitterHandle: '@freeforcharity',
-  contactEmail: 'clarkemoyer@freeforcharity.org',
+    'A Focused Research Organization studying Age-Related Fast-Spike Neuron Decline as a unifying paradigm for age-related functional decline.',
+  // TODO(launch): repoint to https://neurospike.org once the apex is cut over.
+  // Until then this must match what Pages actually serves, or canonicals lie.
+  url: 'https://freeforcharity.github.io/FFC-EX-neurospike.org',
+  twitterHandle: '',
+  contactEmail: 'rlee@codex.stanford.edu',
   keywords: [
-    'nonprofit',
-    'charity',
-    'volunteer',
-    'donate',
-    'free hosting',
-    'domains',
-    'Microsoft 365',
+    'focused research organization',
+    'FRO',
+    'neuroscience',
+    'fast-spike neurons',
+    'FSND',
+    'aging',
+    'computational biology',
+    'in silico',
   ],
-  themeColor: '#ffffff',
+  themeColor: '#0b1020',
   vulnerabilityDisclosurePath: '/vulnerability-disclosure-policy',
   social: [
-    { label: 'Facebook', href: 'https://www.facebook.com/freeforcharity' },
-    { label: 'X (Twitter)', href: 'https://x.com/freeforcharity1' },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/company/freeforcharity/' },
-    // Repo name uses underscores — the hyphenated variant 404s.
-    { label: 'GitHub', href: 'https://github.com/FreeForCharity/FFC-IN-Footer_Only_Template' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/goldspruce' },
+    { label: 'GitHub', href: 'https://github.com/goldspruce' },
+    { label: 'Personal site', href: 'https://fl0wstate.com/neuro/' },
+    { label: 'ORCID', href: 'https://orcid.org/0000-0003-4074-2247' },
   ],
-  ein: '46-2471893',
-  phone: { display: '(520) 222-8104', tel: '5202228104' },
-  addresses: [
-    {
-      label: 'Main Address',
-      lines: ['4030 Wake Forrest Road', 'Suite 349 Raleigh North', 'Carolina 27609'],
-      mapUrl:
-        'https://www.google.com/maps/search/?api=1&query=4030+Wake+Forrest+Road+Suite+349+Raleigh+NC+27609',
-    },
-    {
-      label: 'PA Office Address',
-      lines: ['301 Science Park Road Suite', '119 State College PA 16803'],
-      mapUrl:
-        'https://www.google.com/maps/place/Free+For+Charity/@40.7768455,-77.8963305,17z/data=!3m1!4b1!4m6!3m5!1s0x89cea944b44a2e01:0x6fc2d6bf09e00a0f!8m2!3d40.7768415!4d-77.8937556!16s%2Fg%2F11vzvbl2d7?entry=ttu&g_ep=EgoyMDI1MTEyMy4xIKXMDSoASAFQAw%3D%3D',
-    },
-  ],
-  guidestar: {
-    profileUrl: 'https://www.guidestar.org/profile/46-2471893',
-    directProfileUrl:
-      'https://www.guidestar.org/profile/shared/bbbe173a-87b9-4af9-a8a2-cae255a95742',
-  },
+  // LAUNCH BLOCKER -- REAL VALUE REQUIRED BEFORE CUTOVER.
+  // Not published anywhere on the source site. The SiteConfig contract
+  // (scripts/check-site-config.mjs) requires a non-empty string, so this
+  // carries an unmistakable placeholder rather than either (a) Free For
+  // Charity's own EIN, which would put FFC's tax ID on another org's site, or
+  // (b) an invented number, which would be a fabricated federal identifier.
+  // It renders visibly as PENDING in the footer, on purpose: the gap should be
+  // obvious on the page, not buried in a config comment.
+  ein: 'PENDING',
+  // LAUNCH BLOCKER -- no phone number appears anywhere on the source site.
+  // `tel: 'PENDING'` is deliberately not dialable; a plausible-looking fake
+  // number would route real callers somewhere real.
+  phone: { display: 'PENDING', tel: 'PENDING' },
+  // LAUNCH BLOCKER: no postal address appears on the source site. The only
+  // location information published is a working-hours timezone note, which is
+  // rendered in the footer contact area instead.
+  addresses: [],
+  // LAUNCH BLOCKER -- no Candid/GuideStar profile is published for this org,
+  // which follows from the EIN being unissued/unknown. Both must be replaced
+  // with the real profile URLs before cutover.
+  guidestar: { profileUrl: 'PENDING', directProfileUrl: 'PENDING' },
   supportedBy: {
     name: 'Free For Charity',
     url: 'https://freeforcharity.org',
     hubUrl: 'https://freeforcharity.org/hub/',
   },
-  // parentOrg is intentionally unset: this template is for standalone
-  // charities by default. Set it only for a genuine "a project of"
-  // fiscal-sponsorship relationship.
+  // parentOrg is intentionally unset: Neurospike is a standalone FRO.
 }
 
 function configuredBasePath(): string {

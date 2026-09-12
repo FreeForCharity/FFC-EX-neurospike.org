@@ -17,6 +17,10 @@ type SitemapEntry = {
  */
 export const routes: readonly SitemapEntry[] = [
   { path: '/', changeFrequency: 'weekly', priority: 1.0 },
+  { path: '/org-leadership', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/other-research-cnagi', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/media-about', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/substacky', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/privacy-policy', changeFrequency: 'yearly', priority: 0.2 },
   { path: '/cookie-policy', changeFrequency: 'yearly', priority: 0.2 },
   { path: '/terms-of-service', changeFrequency: 'yearly', priority: 0.2 },
