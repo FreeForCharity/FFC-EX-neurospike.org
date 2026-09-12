@@ -19,6 +19,15 @@ import { GTM_ID } from '@/lib/analytics.config'
  */
 export default function SupportingOrgDisclosure() {
   const supporter = siteConfig.supportedBy.name
+
+  // The supporting organization's OWN site is the one place this section makes
+  // no sense: it would read "Free For Charity participates in the free website
+  // program run by Free For Charity". That organization operates its own
+  // infrastructure, so there is no third party to disclose and no split in
+  // responsibility to explain. Render nothing rather than a self-referential
+  // paragraph — which is exactly what this template itself renders.
+  if (siteConfig.name === supporter) return null
+
   const analyticsEnabled = GTM_ID.trim() !== ''
 
   const p = 'text-[14px] text-[#666] pb-[10px] leading-[24px] font-[500]'
