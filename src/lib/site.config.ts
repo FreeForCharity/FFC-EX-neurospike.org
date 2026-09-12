@@ -118,10 +118,26 @@ export const siteConfig: SiteConfig = {
   shortDescription:
     'A Focused Research Organization studying Age-Related Fast-Spike Neuron Decline as a unifying paradigm for age-related functional decline.',
   // Bare origin, no path -- enforced by scripts/check-drift.mjs. The GitHub
-  // Pages base path is applied separately by sitePath() from
-  // NEXT_PUBLIC_BASE_PATH, so this is the apex the site will serve from and
-  // stays correct both before and after cutover.
-  url: 'https://neurospike.org',
+  // Pages base path is applied separately, by sitePath(), so this value is the
+  // ORIGIN and sitePath() supplies the rest.
+  //
+  // It therefore does NOT stay correct across the custom-domain cutover, which
+  // an earlier version of this comment claimed. siteUrl() returns
+  // `url + sitePath(path)`, so an apex origin while the deploy is still on the
+  // project path yields `https://neurospike.org/FFC-EX-neurospike.org/...` --
+  // a URL neither host serves.
+  //
+  // neurospike.org is not registered as of 2026-09-12: the .org registry
+  // returns NXDOMAIN for it, so there is no zone to point at GitHub Pages and
+  // no public/CNAME can be added yet. Until it exists this site is served only
+  // at https://freeforcharity.github.io/FFC-EX-neurospike.org/, and that is
+  // what canonicals, the sitemap, robots and security.txt must advertise.
+  //
+  // TO CUT OVER, in one change: register the domain and point apex + www at
+  // GitHub Pages, add `public/CNAME` containing `neurospike.org`, set this to
+  // 'https://neurospike.org', and rerun `npm run check:drift` -- checkDeployOrigin
+  // fails if either half is done without the other.
+  url: 'https://freeforcharity.github.io',
   twitterHandle: '',
   contactEmail: 'rlee@codex.stanford.edu',
   keywords: [

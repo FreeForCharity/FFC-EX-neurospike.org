@@ -5,17 +5,16 @@
 # Expires must be a future RFC 3339 datetime. The included GitHub Action opens
 # an issue when the date gets close.
 #
-# Project-site Canonical lines include the GitHub Pages base path used while the
-# site is served without a custom domain. Root Canonical lines cover the apex.
+# The Canonical URLs below describe the ONE origin this deploy serves. With no
+# public/CNAME the site is served at the GitHub Pages project path, so that is
+# what is listed. When neurospike.org is registered and public/CNAME is added,
+# the base path disappears and these lines move to the apex in the same change
+# -- scripts/check-drift.mjs fails if they get out of step.
 
 Contact: mailto:rlee@codex.stanford.edu
 Expires: 2027-12-31T00:00:00.000Z
 Preferred-Languages: en
-Canonical: https://neurospike.org/.well-known/security.txt
-Canonical: https://neurospike.org/security.txt
-Canonical: https://neurospike.org/FFC-EX-neurospike.org/.well-known/security.txt
-Canonical: https://neurospike.org/FFC-EX-neurospike.org/security.txt
-Policy: https://neurospike.org/vulnerability-disclosure-policy
-Policy: https://neurospike.org/FFC-EX-neurospike.org/vulnerability-disclosure-policy
-Acknowledgments: https://neurospike.org/security-acknowledgements
-Acknowledgments: https://neurospike.org/FFC-EX-neurospike.org/security-acknowledgements
+Canonical: https://freeforcharity.github.io/FFC-EX-neurospike.org/.well-known/security.txt
+Canonical: https://freeforcharity.github.io/FFC-EX-neurospike.org/security.txt
+Policy: https://freeforcharity.github.io/FFC-EX-neurospike.org/vulnerability-disclosure-policy
+Acknowledgments: https://freeforcharity.github.io/FFC-EX-neurospike.org/security-acknowledgements
