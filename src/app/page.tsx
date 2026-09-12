@@ -85,7 +85,7 @@ export default function Home() {
         will become &ldquo;the new biology&rdquo; in much the way that theoretical physics became
         &ldquo;the new physics&rdquo; about one century ago. Quantum physicists drove monumental
         progress through pure Gedankenexperiments (thought experiments) and mathematical modeling,
-        thus making theoretical physics a real science and note mere abstract philosophy. By doing a
+        thus making theoretical physics a real science and not mere abstract philosophy. By doing a
         deep dive into theory and math, a physicist could emerge with profound, structurally sound
         insights before eventually turning to experimental validation. If the true promise of
         computational biology is to be realized, modern biologists must demonstrate this same

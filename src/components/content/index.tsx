@@ -69,13 +69,22 @@ export function OL({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** External link. Always rel-guarded — every lifted link leaves this site. */
+/**
+ * External link from lifted content.
+ *
+ * New-tab behaviour applies to http(s) destinations only. `mailto:` and `tel:`
+ * hand off to a mail client or dialler rather than navigating, so opening a tab
+ * for them leaves a blank window behind; `rel="noopener"` is likewise
+ * meaningless for a non-browsing scheme.
+ */
 export function A({ href, children }: { href: string; children: React.ReactNode }) {
+  const opensInBrowser = /^https?:\/\//i.test(href)
+
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={opensInBrowser ? '_blank' : undefined}
+      rel={opensInBrowser ? 'noopener noreferrer' : undefined}
       className="text-[#1a4fd6] underline underline-offset-2 hover:text-[#12379b] break-words"
     >
       {children}

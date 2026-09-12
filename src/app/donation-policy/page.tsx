@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { siteUrl } from '@/lib/site.config'
+import { siteConfig, siteUrl } from '@/lib/site.config'
 
 export const metadata: Metadata = {
   title: 'Donation Policy',
-  description: 'Donation Policy for the Neurospike FRO website',
+  description: `Donation Policy for ${siteConfig.name}`,
   // Own canonical: without it Next inherits the layout's, which points at the home page.
   alternates: { canonical: siteUrl('/donation-policy') },
 }
@@ -33,13 +33,12 @@ export default function DonationPolicy() {
             Use of Donations
           </h2>
           <p>
-            Donations support our mission to reduce costs and increase revenues for nonprofits by
-            providing:
+            Donations support {siteConfig.name}&apos;s mission and the work described on this site,
+            including:
           </p>
           <ul>
-            <li>Free domain registration and hosting services</li>
-            <li>Technology consultation and support</li>
-            <li>Volunteer coordination and training</li>
+            <li>Our research and program activities</li>
+            <li>The tools, data and infrastructure that work depends on</li>
             <li>Administrative costs necessary to operate our programs</li>
           </ul>
 

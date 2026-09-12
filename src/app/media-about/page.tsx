@@ -26,7 +26,7 @@ export default function MediaAbout() {
         He has led and instructed some of the most notable investors and founders in Silicon Valley,
         including a FAANG founder, on freediving and big-wave surf survival experiences.
       </P>
-      <P>His LinkedIn, Github and personal webpage are linked below.</P>
+      <P>His LinkedIn, GitHub and personal webpage are linked below.</P>
 
       <H2 id="publications">Academic publications</H2>
       <UL>
