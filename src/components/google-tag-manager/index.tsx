@@ -2,10 +2,22 @@
 
 import Script from 'next/script'
 
-// Google Tag Manager ID
-const GTM_ID = 'GTM-TQ5H8HPR'
+// Google Tag Manager ID.
+//
+// Deliberately EMPTY until a Neurospike container is provisioned (FFC workflow
+// 704 / the 5xx Google lane). The template ships Free For Charity's own
+// container here, and leaving it in place would send this charity's visitor
+// analytics to FFC's property -- which is why `rebrand-check` calls it out.
+// An empty id disables both tags below rather than emitting a snippet that
+// requests `gtm.js?id=` and fails in the browser.
+//
+// Do NOT name the template's container id in this comment: rebrand-check greps
+// the file for that literal, so quoting it here re-triggers the very warning
+// this change clears.
+const GTM_ID = ''
 
 export default function GoogleTagManager() {
+  if (!GTM_ID) return null
   return (
     <>
       {/* Google Tag Manager Script - loaded with lazyOnload for better performance */}
@@ -28,6 +40,7 @@ export default function GoogleTagManager() {
 
 // Export a component for the noscript iframe that goes in the body
 export function GoogleTagManagerNoScript() {
+  if (!GTM_ID) return null
   return (
     <noscript>
       <iframe

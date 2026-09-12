@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { siteUrl } from '@/lib/site.config'
 
 export const metadata: Metadata = {
-  title: 'Donation Policy | Free For Charity',
-  description: 'Donation Policy for Free For Charity website',
+  title: 'Donation Policy | Neurospike FRO',
+  description: 'Donation Policy for the Neurospike FRO website',
   // Own canonical: without it Next inherits the layout's, which points at the home page.
   alternates: { canonical: siteUrl('/donation-policy') },
 }
@@ -25,8 +25,8 @@ export default function DonationPolicy() {
             Tax Deductibility
           </h2>
           <p>
-            Free For Charity is a qualified 501(c)(3) nonprofit organization (EIN: 46-2471893).
-            Donations are tax-deductible to the full extent allowed by law.
+            NeuroSpike is a qualified 501(c)(3) public charity (EIN: 42-2753465). Donations are
+            tax-deductible to the full extent allowed by law.
           </p>
 
           <h2 className="font-[var(--font-faustina)] text-[32px] leading-[40px] mt-8 mb-4">
@@ -73,14 +73,9 @@ export default function DonationPolicy() {
           <p>For questions about donations or this policy, please contact us at:</p>
           <p>
             Email:{' '}
-            <a
-              href="mailto:clarkemoyer@freeforcharity.org"
-              className="text-primary hover:underline"
-            >
-              clarkemoyer@freeforcharity.org
+            <a href="mailto:rlee@codex.stanford.edu" className="text-primary hover:underline">
+              rlee@codex.stanford.edu
             </a>
-            <br />
-            Phone: (520) 222-8104
           </p>
         </div>
       </div>

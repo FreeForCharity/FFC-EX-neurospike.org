@@ -76,19 +76,16 @@ const Footer: React.FC = () => {
 
           <ul className="space-y-2 text-sm" id="lato-font">
             {[
-              // Adopters: edit these labels and anchors to match your own
-              // site's sections. This footer-only template ships no page
-              // sections besides the team block, so the anchors below are
-              // conventional section ids a charity site typically adds
-              // (matching the FFC Single Page template's sections).
-              { name: 'Home', href: '/#hero' },
-              { name: 'Mission', href: '/#mission' },
-              { name: 'Programs', href: '/#programs' },
-              { name: 'Events', href: '/#events' },
-              { name: 'Donate', href: '/#donate' },
-              { name: 'Volunteer', href: '/#volunteer' },
-              { name: 'FAQ', href: '/#faq' },
-              { name: 'Team', href: '/#team' },
+              // These mirror the real routes this site serves (which are the
+              // five pages lifted from the source Google Site). The template's
+              // defaults were anchors -- /#mission, /#programs, /#donate and
+              // friends -- to sections this site does not have, so every one of
+              // them was a dead link that still rendered as a working one.
+              { name: 'Executive Summary', href: '/' },
+              { name: 'Org & Leadership', href: '/org-leadership' },
+              { name: 'Other Research: CNAGI', href: '/other-research-cnagi' },
+              { name: 'Media & About', href: '/media-about' },
+              { name: 'Substacky', href: '/substacky' },
               // FFC footer standard: every supported charity site links back
               // to the supporting org's hub. Always rendered — keep this
               // entry when customizing a fork.

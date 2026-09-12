@@ -1,5 +1,5 @@
 /**
- * Central site configuration for Free For Charity template sites.
+ * Central site configuration for this FFC-supported charity site.
  *
  * EDIT THIS FILE to customize a new FFC-supported nonprofit site.
  * Most values that vary between sites flow from here so pages, metadata,
@@ -82,7 +82,7 @@ export type SiteConfig = {
   vulnerabilityDisclosurePath: string
   /** Social links displayed in the footer. */
   social: readonly SiteSocialLink[]
-  /** IRS Employer Identification Number (tax ID), e.g. '46-2471893'. */
+  /** IRS Employer Identification Number (tax ID), e.g. '12-3456789'. */
   ein: string
   /**
    * Primary phone number. `display` is the human-readable form shown to users;
@@ -117,9 +117,11 @@ export const siteConfig: SiteConfig = {
     'Neurospike is a Focused Research Organization studying Age-Related Fast-Spike Neuron Decline (FSND) as a unifying paradigm for age-related functional decline, developed translation-ready and in silico.',
   shortDescription:
     'A Focused Research Organization studying Age-Related Fast-Spike Neuron Decline as a unifying paradigm for age-related functional decline.',
-  // TODO(launch): repoint to https://neurospike.org once the apex is cut over.
-  // Until then this must match what Pages actually serves, or canonicals lie.
-  url: 'https://freeforcharity.github.io/FFC-EX-neurospike.org',
+  // Bare origin, no path -- enforced by scripts/check-drift.mjs. The GitHub
+  // Pages base path is applied separately by sitePath() from
+  // NEXT_PUBLIC_BASE_PATH, so this is the apex the site will serve from and
+  // stays correct both before and after cutover.
+  url: 'https://neurospike.org',
   twitterHandle: '',
   contactEmail: 'rlee@codex.stanford.edu',
   keywords: [
@@ -140,27 +142,32 @@ export const siteConfig: SiteConfig = {
     { label: 'Personal site', href: 'https://fl0wstate.com/neuro/' },
     { label: 'ORCID', href: 'https://orcid.org/0000-0003-4074-2247' },
   ],
-  // LAUNCH BLOCKER -- REAL VALUE REQUIRED BEFORE CUTOVER.
-  // Not published anywhere on the source site. The SiteConfig contract
-  // (scripts/check-site-config.mjs) requires a non-empty string, so this
-  // carries an unmistakable placeholder rather than either (a) Free For
-  // Charity's own EIN, which would put FFC's tax ID on another org's site, or
-  // (b) an invented number, which would be a fabricated federal identifier.
-  // It renders visibly as PENDING in the footer, on purpose: the gap should be
-  // obvious on the page, not buried in a config comment.
-  ein: 'PENDING',
-  // LAUNCH BLOCKER -- no phone number appears anywhere on the source site.
-  // `tel: 'PENDING'` is deliberately not dialable; a plausible-looking fake
-  // number would route real callers somewhere real.
+  // Verified against the organization's Candid profile 2026-09-12:
+  // https://app.candid.org/profile/16713649/neurospike-42-2753465
+  // Tax status there reads "501(c)(3) Public Charity". Note the legal name on
+  // the determination is "NeuroSpike"; `name` above is the site's own branding
+  // ("Neurospike FRO"), which is what every page of the source site uses.
+  ein: '42-2753465',
+  // LAUNCH BLOCKER -- still the one unknown. No phone number appears on the
+  // source site or on the Candid profile. `tel: 'PENDING'` is deliberately not
+  // dialable; a plausible-looking fake would route real callers somewhere real.
   phone: { display: 'PENDING', tel: 'PENDING' },
-  // LAUNCH BLOCKER: no postal address appears on the source site. The only
-  // location information published is a working-hours timezone note, which is
-  // rendered in the footer contact area instead.
-  addresses: [],
-  // LAUNCH BLOCKER -- no Candid/GuideStar profile is published for this org,
-  // which follows from the EIN being unissued/unknown. Both must be replaced
-  // with the real profile URLs before cutover.
-  guidestar: { profileUrl: 'PENDING', directProfileUrl: 'PENDING' },
+  // From the Candid profile (the source website publishes no address).
+  addresses: [
+    {
+      label: 'Main Address',
+      lines: ['18516 Garnet Ln', 'Morgan Hill, CA 95037', 'United States'],
+      mapUrl:
+        'https://www.google.com/maps/search/?api=1&query=18516+Garnet+Ln+Morgan+Hill+CA+95037',
+    },
+  ],
+  // Both verified 200 on 2026-09-12. `directProfileUrl` uses the canonical
+  // Candid app URL rather than the `?pkId=...` form, which carries a session
+  // parameter that should not be published.
+  guidestar: {
+    profileUrl: 'https://www.guidestar.org/profile/42-2753465',
+    directProfileUrl: 'https://app.candid.org/profile/16713649/neurospike-42-2753465',
+  },
   supportedBy: {
     name: 'Free For Charity',
     url: 'https://freeforcharity.org',
