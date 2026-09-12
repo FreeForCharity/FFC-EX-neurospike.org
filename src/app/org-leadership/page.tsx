@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import React from 'react'
 import { siteUrl } from '@/lib/site.config'
-import { PageShell, PageTitle, H2, H3, P, UL, A, Lede, MissingAsset } from '@/components/content'
+import { PageShell, PageTitle, H2, H3, P, UL, A, Lede } from '@/components/content'
 
 export const metadata: Metadata = {
   title: 'Org & Leadership | Neurospike FRO',
@@ -62,7 +62,6 @@ export default function OrgLeadership() {
           experience in corporate formation, funding, and tech transfer.
         </li>
       </UL>
-      <MissingAsset label="Leadership / organization visuals from the source Org & Leadership page (3 images)." />
 
       <H2 id="links">Links</H2>
       <UL>

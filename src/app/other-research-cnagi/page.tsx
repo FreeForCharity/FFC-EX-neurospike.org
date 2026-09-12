@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import React from 'react'
 import { siteUrl } from '@/lib/site.config'
-import { PageShell, PageTitle, H2, H3, P, UL, A, Lede, MissingAsset } from '@/components/content'
+import { PageShell, PageTitle, H2, H3, P, UL, A, Lede } from '@/components/content'
+import ContentImage from '@/components/content/ContentImage'
 
 export const metadata: Metadata = {
   title: 'Other Research: CNAGI | Neurospike FRO',
@@ -15,6 +16,13 @@ export default function OtherResearchCnagi() {
     <PageShell>
       <PageTitle>Other Research: CNAGI</PageTitle>
       <Lede>CNAGI &amp; AI Theory of Mind</Lede>
+
+      <ContentImage
+        src="/images/content/cnagi-01.jpg"
+        alt="CNAGI and AI Theory of Mind overview"
+        width={402}
+        height={642}
+      />
 
       <H2 id="sally-anne">Sally-Anne &ldquo;false belief&rdquo; test</H2>
       <P>Simon Baron-Cohen — Borat&apos;s brother.</P>
@@ -98,7 +106,12 @@ export default function OtherResearchCnagi() {
 
       <H2 id="sample-code">Sample code</H2>
       <P>LLM Theory of Mind Subtraction Test — see more here.</P>
-      <MissingAsset label="Sample-code screenshots and result tables from the source CNAGI page (7 images)." />
+      <ContentImage
+        src="/images/content/cnagi-02.png"
+        alt="LLM Theory of Mind subtraction test — sample code"
+        width={1260}
+        height={1118}
+      />
       <P>
         <strong>Why Harrisburg Wins:</strong> Even though Philadelphia got more votes (65%), it
         performed worse than expected (85%). Harrisburg received fewer votes (35%), but it performed
@@ -135,6 +148,18 @@ export default function OtherResearchCnagi() {
         To find the truth, DoLa performs a mathematical operation equivalent to Prelec&apos;s
         algorithm:
       </P>
+      <ContentImage
+        src="/images/content/cnagi-03.png"
+        alt="The SP calculation expressed as a formula"
+        width={826}
+        height={114}
+      />
+      <ContentImage
+        src="/images/content/cnagi-04.png"
+        alt="Worked SP calculation and results table"
+        width={1280}
+        height={895}
+      />
       <P>
         <strong>Conclusion:</strong> Just as Prelec subtracts the &ldquo;Crowd&apos;s
         Expectation&rdquo; to find the Expert Truth, DoLa techniques subtract the &ldquo;Early
@@ -223,6 +248,25 @@ export default function OtherResearchCnagi() {
           &ldquo;Basket&rdquo; becomes the Surprisingly Popular answer.
         </li>
       </UL>
+
+      <ContentImage
+        src="/images/content/cnagi-05.png"
+        alt="Inhibitory control subtraction, expressed as a formula"
+        width={838}
+        height={89}
+      />
+      <ContentImage
+        src="/images/content/cnagi-06.png"
+        alt="Prelec SP algorithm mapped to transformer layers"
+        width={1280}
+        height={1231}
+      />
+      <ContentImage
+        src="/images/content/cnagi-07.png"
+        alt="The grand analogy: Sally-Anne, Prelec and DoLa side by side"
+        width={1280}
+        height={1310}
+      />
 
       <P>
         Mostly on US Pacific Time (GMT −7/8). Sometimes on US Eastern Time (GMT −4/5) or China

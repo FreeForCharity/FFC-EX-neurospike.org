@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import React from 'react'
 import { siteUrl } from '@/lib/site.config'
-import { PageShell, PageTitle, H2, P, UL, A, MissingAsset } from '@/components/content'
+import { PageShell, PageTitle, H2, P, UL, A } from '@/components/content'
+import ContentImage from '@/components/content/ContentImage'
 
 export const metadata: Metadata = {
   title: 'Media & About | Neurospike FRO',
@@ -46,7 +47,24 @@ export default function MediaAbout() {
           </A>
         </li>
       </UL>
-      <MissingAsset label="Media photographs from the source Media & About page (3 images)." />
+      <ContentImage
+        src="/images/content/media-01.jpg"
+        alt="Robert H. Lee, media appearance"
+        width={404}
+        height={413}
+      />
+      <ContentImage
+        src="/images/content/media-02.png"
+        alt="Press coverage featuring Robert H. Lee"
+        width={902}
+        height={1420}
+      />
+      <ContentImage
+        src="/images/content/media-03.jpg"
+        alt="Press coverage featuring Robert H. Lee"
+        width={1280}
+        height={1707}
+      />
 
       <H2 id="links">Links</H2>
       <UL>

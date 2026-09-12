@@ -82,22 +82,3 @@ export function A({ href, children }: { href: string; children: React.ReactNode 
     </a>
   )
 }
-
-/**
- * A block whose source artifact did not survive the migration.
- *
- * The Google Sites originals for these are served from per-render, signed
- * `lh3.googleusercontent.com/sitesv/...` URLs that return 403 to anything
- * outside the rendering session, so they could not be localized. Rendering a
- * labelled placeholder keeps the gap visible on the page instead of silently
- * dropping content the source had.
- */
-export function MissingAsset({ label }: { label: string }) {
-  return (
-    <div className="my-[16px] rounded-[6px] border border-dashed border-[#c9ccd4] bg-[#f7f8fa] px-[16px] py-[14px]">
-      <p className="text-[13px] leading-[20px] text-[#6b7280] font-[500]">
-        <strong className="text-[#374151]">Image pending migration:</strong> {label}
-      </p>
-    </div>
-  )
-}
