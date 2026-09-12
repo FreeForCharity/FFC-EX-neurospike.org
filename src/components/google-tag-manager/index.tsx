@@ -1,20 +1,15 @@
 'use client'
 
 import Script from 'next/script'
+import { GTM_ID } from '@/lib/analytics.config'
 
-// Google Tag Manager ID.
+// The container id lives in `src/lib/analytics.config.ts`, NOT here.
 //
-// Deliberately EMPTY until a Neurospike container is provisioned (FFC workflow
-// 704 / the 5xx Google lane). The template ships Free For Charity's own
-// container here, and leaving it in place would send this charity's visitor
-// analytics to FFC's property -- which is why `rebrand-check` calls it out.
-// An empty id disables both tags below rather than emitting a snippet that
-// requests `gtm.js?id=` and fails in the browser.
-//
-// Do NOT name the template's container id in this comment: rebrand-check greps
-// the file for that literal, so quoting it here re-triggers the very warning
-// this change clears.
-export const GTM_ID: string = ''
+// This module is `'use client'`. A server component that imports a non-component
+// export from a client module gets a client-reference proxy rather than the
+// value, so `GTM_ID.trim()` threw during static export while every unit test
+// passed. Keeping the constant in a plain module means both sides read the same
+// string. Deliberately not re-exported from here, so that trap cannot come back.
 
 /**
  * Both components take an optional `gtmId` that defaults to GTM_ID above.

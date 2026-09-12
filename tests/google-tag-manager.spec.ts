@@ -36,7 +36,7 @@ test.describe('Google Tag Manager Integration', () => {
   // report a red suite for a site that is behaving exactly as designed.
   test.skip(
     !testConfig.googleTagManager.configured,
-    'No GTM container is configured for this site yet (src/components/google-tag-manager GTM_ID is empty).'
+    'No GTM container is configured for this site yet (src/lib/analytics.config.ts GTM_ID is empty).'
   )
 
   test('should initialize dataLayer on page load', async ({ page }) => {
@@ -185,7 +185,7 @@ test.describe('Google Tag Manager Configuration', () => {
   // made the local E2E run red while the unit suite was green.
   test.skip(
     !testConfig.googleTagManager.configured,
-    'No GTM container is configured for this site yet (src/components/google-tag-manager GTM_ID is empty).'
+    'No GTM container is configured for this site yet (src/lib/analytics.config.ts GTM_ID is empty).'
   )
 
   test('should load GTM script with configured ID', async ({ page }) => {
