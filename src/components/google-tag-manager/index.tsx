@@ -14,7 +14,7 @@ import Script from 'next/script'
 // Do NOT name the template's container id in this comment: rebrand-check greps
 // the file for that literal, so quoting it here re-triggers the very warning
 // this change clears.
-export const GTM_ID = ''
+export const GTM_ID: string = ''
 
 /**
  * Both components take an optional `gtmId` that defaults to GTM_ID above.

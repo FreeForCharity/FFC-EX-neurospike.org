@@ -189,7 +189,7 @@ describe('page titles compose with the layout template without repeating the sit
   })
 
   it.each(routes.filter((route) => route.path !== '/'))(
-    'composes a single site name for $path',
+    'composes a single site name suffix for $path',
     (route) => {
       const metadata = metadataByRoute[route.path]
       const pageTitle = metadata.title as string
@@ -197,9 +197,20 @@ describe('page titles compose with the layout template without repeating the sit
       expect(typeof pageTitle).toBe('string')
       expect(pageTitle.length).toBeGreaterThan(0)
 
+      // The page must not already carry the suffix the template appends.
+      // Deliberately NOT "the site name appears exactly once in the composed
+      // title": a page name may legitimately contain the org name — the FFC
+      // donation policy page is called "Free For Charity Donation Policy", and
+      // on FFC's own deployment siteConfig.name is "Free For Charity", so the
+      // correct title carries it twice. What is always wrong is the page
+      // repeating the trailing "| <site name>" the layout adds.
+      const suffix = `| ${siteConfig.name}`
+      expect(pageTitle.trimEnd().endsWith(suffix)).toBe(false)
+
       const rendered = template.replace('%s', pageTitle)
-      // Exactly one occurrence: splitting on it yields exactly two fragments.
-      expect(rendered.split(siteConfig.name)).toHaveLength(2)
+      expect(rendered.trimEnd().endsWith(suffix)).toBe(true)
+      // ...and only once at the end.
+      expect(rendered.trimEnd().slice(0, -suffix.length).endsWith(suffix)).toBe(false)
     }
   )
 
