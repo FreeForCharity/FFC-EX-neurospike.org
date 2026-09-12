@@ -14,7 +14,7 @@ export function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <main id="main-content" className="pt-[140px] pb-[54px]">
       <div className="py-[27px] w-[90%] md:w-[80%] mx-auto">
-        <div id="aria-font">{children}</div>
+        <div className="aria-font">{children}</div>
       </div>
     </main>
   )

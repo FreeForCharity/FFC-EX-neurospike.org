@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import React from 'react'
-import { siteUrl } from '@/lib/site.config'
+import { siteConfig, siteUrl } from '@/lib/site.config'
 import { PageShell, PageTitle, H2, H3, P, UL, OL, A, Lede } from '@/components/content'
 import ContentImage from '@/components/content/ContentImage'
 
 export const metadata: Metadata = {
-  title: 'Neurospike FRO | Executive Summary',
+  title: `${siteConfig.name} | Executive Summary`,
   description:
     'Executive summary of the NeuroSpike Focused Research Organization: Age-Related Fast-Spike Neuron Decline (FSND) as a unifying paradigm for age-related functional decline.',
   alternates: { canonical: siteUrl('/') },
@@ -14,9 +14,9 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <PageShell>
-      <PageTitle>Neurospike FRO</PageTitle>
+      <PageTitle>{siteConfig.name}</PageTitle>
       <Lede>
-        Executive Summary — NeuroSpike FRO. Below, and also available as a stand-alone document.
+        Executive Summary — {siteConfig.name}. Below, and also available as a stand-alone document.
       </Lede>
 
       <H2 id="materials">Materials</H2>
