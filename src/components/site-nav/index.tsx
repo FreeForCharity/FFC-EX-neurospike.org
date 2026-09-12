@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { sitePath } from '@/lib/site.config'
+import { siteConfig, sitePath } from '@/lib/site.config'
 
 /**
  * Top navigation, mirroring the source Google Sites nav one-for-one.
@@ -37,7 +37,7 @@ export default function SiteNav() {
           href={sitePath('/')}
           className="text-[15px] font-[600] text-white no-underline mr-auto whitespace-nowrap"
         >
-          Neurospike FRO
+          {siteConfig.name}
         </Link>
         {links.map((l) => (
           <Link
