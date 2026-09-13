@@ -7,7 +7,7 @@ import ContentImage from '@/components/content/ContentImage'
 export const metadata: Metadata = {
   title: `${siteConfig.name} | Executive Summary`,
   description:
-    'Executive summary of the NeuroSpike Focused Research Organization: Age-Related Fast-Spike Neuron Decline (FSND) as a unifying paradigm for age-related functional decline.',
+    'Executive summary of the Neurospike Focused Research Organization: Age-Related Fast-Spike Neuron Decline (FSND) as a unifying paradigm for age-related functional decline.',
   alternates: { canonical: siteUrl('/') },
 }
 
