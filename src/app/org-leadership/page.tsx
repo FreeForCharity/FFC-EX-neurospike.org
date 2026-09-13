@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import React from 'react'
 import { siteUrl } from '@/lib/site.config'
 import { PageShell, PageTitle, H2, H3, P, UL, A, Lede } from '@/components/content'
+import TeamMemberCard from '@/components/ui/TeamMemberCard'
+import { team } from '@/data/team'
 
 export const metadata: Metadata = {
   title: 'Org & Leadership',
   description:
-    'NeuroSpike operates as a lean virtual biotech during Phase 0 and Phase 1, and is recruiting science advisors and consultants.',
+    'Neurospike operates as a lean virtual biotech during Phase 0 and Phase 1, and is recruiting science advisors and consultants.',
   alternates: { canonical: siteUrl('/org-leadership') },
 }
 
@@ -17,7 +19,7 @@ export default function OrgLeadership() {
       <Lede>Lean Biotech Operation — Phase 0 &amp; 1</Lede>
 
       <P>
-        NeuroSpike is designed for maximum capital efficiency. During Phase 0 &amp; Phase 1, the FRO
+        Neurospike is designed for maximum capital efficiency. During Phase 0 &amp; Phase 1, the FRO
         will operate as a lean virtual biotech. The project lead will act as the sole internal
         employee and principal architect, leveraging modern in-silico pipelines and managing a
         decentralized network of specialized consultants.
@@ -62,6 +64,26 @@ export default function OrgLeadership() {
           experience in corporate formation, funding, and tech transfer.
         </li>
       </UL>
+
+      {/*
+        The roster in src/data/team/ was maintained but rendered nowhere: the
+        content lift replaced the template home page, orphaning the component
+        that used to display it (#25). Rendered here rather than reusing
+        components/home-page/TheFreeForCharityTeam, which hardcodes an <h1>
+        reading "The Free For Charity Team" -- FFC's branding, and a second
+        <h1> on a page that already has one.
+      */}
+      <H2 id="people">People</H2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[30px] my-[22px]">
+        {team.map((member) => (
+          <TeamMemberCard
+            key={member.name}
+            name={member.name}
+            role={member.role}
+            linkedinUrl={member.linkedinUrl}
+          />
+        ))}
+      </div>
 
       <H2 id="links">Links</H2>
       <UL>
