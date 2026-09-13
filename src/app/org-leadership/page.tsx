@@ -1,16 +1,16 @@
 import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/pageMetadata'
 import React from 'react'
-import { siteUrl } from '@/lib/site.config'
 import { PageShell, PageTitle, H2, H3, P, UL, A, Lede } from '@/components/content'
 import TeamMemberCard from '@/components/ui/TeamMemberCard'
 import { team } from '@/data/team'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Org & Leadership',
   description:
     'Neurospike operates as a lean virtual biotech during Phase 0 and Phase 1, and is recruiting science advisors and consultants.',
-  alternates: { canonical: siteUrl('/org-leadership') },
-}
+  path: '/org-leadership',
+})
 
 export default function OrgLeadership() {
   return (

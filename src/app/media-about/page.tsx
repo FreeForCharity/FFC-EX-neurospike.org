@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/pageMetadata'
 import React from 'react'
-import { siteUrl } from '@/lib/site.config'
 import { PageShell, PageTitle, H2, P, UL, A } from '@/components/content'
 import ContentImage from '@/components/content/ContentImage'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Media & About',
   description:
     'About Robert H. Lee — deep tech investing, early-stage operations, academic publications and media appearances.',
-  alternates: { canonical: siteUrl('/media-about') },
-}
+  path: '/media-about',
+})
 
 export default function MediaAbout() {
   return (
