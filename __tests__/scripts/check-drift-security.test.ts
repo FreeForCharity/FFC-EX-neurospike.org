@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { githubPagesProjectPath } from '../helpers/githubPagesProjectPath'
@@ -33,13 +33,40 @@ function payload(
   ].join('\n')
 }
 
+/**
+ * Writes the real card with its IHDR dimensions rewritten.
+ *
+ * Bytes 16..24 of a PNG are width and height as big-endian uint32s. The CRC
+ * that follows is deliberately left stale -- the guard reads the header and
+ * never validates it, and a fixture that faithfully re-CRCs would be testing
+ * a property nothing depends on. This exists because the guard has TWO size
+ * checks and only one of them was reachable: with a genuine 1200x630 PNG in
+ * place, "declared size disagrees with the file" always fires first and
+ * "the file is not 1200x630 at all" never runs. Mutation testing found that
+ * -- neutering the absolute check left the suite green.
+ */
+function cardResizedTo(width: number, height: number): Buffer {
+  const bytes = Buffer.from(readFileSync(join(process.cwd(), 'public/og-card.png')))
+  bytes.writeUInt32BE(width, 16)
+  bytes.writeUInt32BE(height, 20)
+  return bytes
+}
+
 function makeFixture(
   overrides: Partial<
     Record<
-      'headers' | 'layout' | 'siteConfig' | 'wellKnown' | 'rootSecurity' | 'cname' | 'siteMetadata',
+      | 'headers'
+      | 'layout'
+      | 'siteConfig'
+      | 'wellKnown'
+      | 'rootSecurity'
+      | 'cname'
+      | 'siteMetadata'
+      | 'ogCard',
       string | null
     >
-  > = {}
+  > = {},
+  ogCardBytes?: Buffer
 ) {
   const dir = mkdtempSync(join(tmpdir(), 'ffc-drift-'))
   mkdirSync(join(dir, 'scripts'), { recursive: true })
@@ -48,9 +75,10 @@ function makeFixture(
   mkdirSync(join(dir, 'public/.well-known'), { recursive: true })
   cpSync(join(process.cwd(), 'scripts/check-drift.mjs'), join(dir, 'scripts/check-drift.mjs'))
   // The real card, so the social-card guard has a genuine 1200x630 PNG to
-  // read an IHDR out of. `ogCardSize` below replaces it for the size cases.
+  // read an IHDR out of. cardResizedTo() below replaces it for the size cases.
   if (overrides.ogCard !== null)
     cpSync(join(process.cwd(), 'public/og-card.png'), join(dir, 'public/og-card.png'))
+  if (ogCardBytes) writeFileSync(join(dir, 'public/og-card.png'), ogCardBytes)
 
   const files = {
     headers: [
@@ -517,5 +545,26 @@ describe('social card guard', () => {
 
     expect(status).toBe(1)
     expect(output).toContain('does not declare the social card width and height')
+  })
+
+  // The other half of the size guard: the PNG itself is the wrong size, and
+  // the declaration agrees with it, so the two never disagree.
+  it('fails when the card is a consistent but wrong size', () => {
+    const dir = makeFixture(
+      {
+        siteMetadata:
+          "const socialCard = { url: assetPath('/og-card.png'), width: 600, height: 315 }\n",
+      },
+      cardResizedTo(600, 315)
+    )
+    fixtures.push(dir)
+    const { status, output } = runDrift(dir)
+
+    expect(status).toBe(1)
+    expect(output).toContain('public/og-card.png is 600x315')
+    expect(output).toContain('1200x630')
+    // Precisely because the declaration matches, the mismatch error must NOT
+    // be what caught it -- otherwise this passes without the check it targets.
+    expect(output).not.toContain('declares 600x315')
   })
 })
