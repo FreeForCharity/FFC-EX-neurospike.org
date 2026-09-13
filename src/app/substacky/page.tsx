@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/pageMetadata'
 import React from 'react'
-import { siteUrl } from '@/lib/site.config'
 import { PageShell, PageTitle, H2, P, UL, A, Lede } from '@/components/content'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Substacky',
   description:
     'Not Yet a Substack — essays and FAQs on techbio, science advocacy, deep tech product-market fit and early-stage fundraising.',
-  alternates: { canonical: siteUrl('/substacky') },
-}
+  path: '/substacky',
+})
 
 export default function Substacky() {
   return (

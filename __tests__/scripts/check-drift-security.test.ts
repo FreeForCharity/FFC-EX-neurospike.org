@@ -36,7 +36,7 @@ function payload(
 function makeFixture(
   overrides: Partial<
     Record<
-      'headers' | 'layout' | 'siteConfig' | 'wellKnown' | 'rootSecurity' | 'cname',
+      'headers' | 'layout' | 'siteConfig' | 'wellKnown' | 'rootSecurity' | 'cname' | 'siteMetadata',
       string | null
     >
   > = {}
@@ -47,6 +47,10 @@ function makeFixture(
   mkdirSync(join(dir, 'src/lib'), { recursive: true })
   mkdirSync(join(dir, 'public/.well-known'), { recursive: true })
   cpSync(join(process.cwd(), 'scripts/check-drift.mjs'), join(dir, 'scripts/check-drift.mjs'))
+  // The real card, so the social-card guard has a genuine 1200x630 PNG to
+  // read an IHDR out of. `ogCardSize` below replaces it for the size cases.
+  if (overrides.ogCard !== null)
+    cpSync(join(process.cwd(), 'public/og-card.png'), join(dir, 'public/og-card.png'))
 
   const files = {
     headers: [
@@ -69,6 +73,8 @@ function makeFixture(
       "export const siteConfig = { url: 'https://ffcworkingsite1.org', vulnerabilityDisclosurePath: '/vulnerability-disclosure-policy' }\n",
     wellKnown: payload(),
     rootSecurity: payload(),
+    siteMetadata:
+      "const socialCard = { url: assetPath('/og-card.png'), width: 1200, height: 630 }\n",
     // No public/CNAME by default: that is the state a freshly provisioned
     // charity repo is in, and the state the deploy reads as "project path".
     cname: null,
@@ -84,6 +90,8 @@ function makeFixture(
   if (files.rootSecurity !== null)
     writeFileSync(join(dir, 'public/security.txt'), files.rootSecurity)
   if (files.cname !== null) writeFileSync(join(dir, 'public/CNAME'), files.cname)
+  if (files.siteMetadata !== null)
+    writeFileSync(join(dir, 'src/lib/siteMetadata.ts'), files.siteMetadata)
 
   return dir
 }
@@ -445,5 +453,69 @@ describe('security drift guard', () => {
     expect(result.status).not.toBe(0)
     expect(result.output).toContain('CSP "upgrade-insecure-requests" drifted')
     expect(result.output).toContain('only in _headers')
+  })
+})
+
+describe('social card guard', () => {
+  let fixtures: string[] = []
+
+  afterEach(() => {
+    for (const dir of fixtures) rmSync(dir, { recursive: true, force: true })
+    fixtures = []
+  })
+
+  function fixture(overrides: Parameters<typeof makeFixture>[0] = {}) {
+    const dir = makeFixture(overrides)
+    fixtures.push(dir)
+    return dir
+  }
+
+  it('accepts a 1200x630 card declared beside an assetPath reference', () => {
+    const { status, output } = runDrift(fixture())
+
+    expect(status).toBe(0)
+    expect(output).not.toContain('og-card.png')
+  })
+
+  it('fails when the card is missing entirely', () => {
+    const { status, output } = runDrift(fixture({ ogCard: null }))
+
+    expect(status).toBe(1)
+    expect(output).toContain('public/og-card.png is missing')
+  })
+
+  // The defect #23 filed: a square image under `summary_large_image`.
+  it('fails when the declared size is not 1200x630', () => {
+    const { status, output } = runDrift(
+      fixture({
+        siteMetadata:
+          "const socialCard = { url: assetPath('/og-card.png'), width: 512, height: 512 }\n",
+      })
+    )
+
+    expect(status).toBe(1)
+    expect(output).toMatch(/1200x630 but .*declares 512x512/)
+  })
+
+  // A URL written without assetPath() drops the GitHub Pages base path -- the
+  // same composition bug that took every navigation link down in #17.
+  it('fails when the card is referenced without assetPath()', () => {
+    const { status, output } = runDrift(
+      fixture({
+        siteMetadata: "const socialCard = { url: '/og-card.png', width: 1200, height: 630 }\n",
+      })
+    )
+
+    expect(status).toBe(1)
+    expect(output).toContain("does not reference assetPath('/og-card.png')")
+  })
+
+  it('fails when the dimensions are not declared at all', () => {
+    const { status, output } = runDrift(
+      fixture({ siteMetadata: "const socialCard = { url: assetPath('/og-card.png') }\n" })
+    )
+
+    expect(status).toBe(1)
+    expect(output).toContain('does not declare the social card width and height')
   })
 })

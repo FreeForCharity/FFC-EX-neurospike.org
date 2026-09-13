@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/pageMetadata'
 import React from 'react'
-import { siteUrl } from '@/lib/site.config'
 import { PageShell, PageTitle, H2, H3, P, UL, A, Lede } from '@/components/content'
 import ContentImage from '@/components/content/ContentImage'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Other Research: CNAGI',
   description:
     'Mechanistic Empathy: Decoding by Contrasting Layers (DoLa) as a Functional Analogue to Inhibitory Control in Theory of Mind.',
-  alternates: { canonical: siteUrl('/other-research-cnagi') },
-}
+  path: '/other-research-cnagi',
+})
 
 export default function OtherResearchCnagi() {
   return (
