@@ -72,7 +72,7 @@ export default function DonationPolicy() {
           <p>For questions about donations or this policy, please contact us at:</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.contactEmail}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.contactEmail}`} className="text-primary underline">
               {siteConfig.contactEmail}
             </a>
           </p>

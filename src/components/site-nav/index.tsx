@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { siteConfig, sitePath } from '@/lib/site.config'
+import { siteConfig } from '@/lib/site.config'
 
 /**
  * Top navigation, mirroring the source Google Sites nav one-for-one.
@@ -13,6 +13,20 @@ import { siteConfig, sitePath } from '@/lib/site.config'
  * single-page anchor scrolling (`/#hero`, `/#team`). The migrated site has five
  * real routes, so anchor-spy navigation is the wrong shape; this is a plain
  * server-rendered nav with no client JS.
+ *
+ * HREFS ARE BARE ROUTE PATHS -- do NOT wrap them in sitePath().
+ *
+ * next/link applies `basePath` itself. Wrapping the href in sitePath() applies
+ * it a SECOND time, and on a GitHub Pages project deploy every link in this nav
+ * then points at `/<repo>/<repo>/...` and 404s. That shipped: the site was live
+ * with all five nav links broken while 348 unit tests, 43 E2E tests, Lighthouse
+ * and the link checker were green, because all of them run a build with no
+ * base path, where sitePath() is the identity function and the bug is
+ * invisible. scripts/check-drift.mjs now fails on the pattern statically.
+ *
+ * The rule: next/link and next/router take BARE paths; sitePath() is only for
+ * hrefs Next does not process -- a raw <a> to a static file in public/, for
+ * example (see the security.txt link in the vulnerability disclosure policy).
  */
 
 const NAV_BG = '#a3201c'
@@ -34,7 +48,7 @@ export default function SiteNav() {
     >
       <div className="w-[94%] xl:w-[88%] mx-auto flex flex-wrap items-center gap-x-[24px] gap-y-[2px] py-[12px]">
         <Link
-          href={sitePath('/')}
+          href="/"
           className="text-[15px] font-[600] text-white no-underline mr-auto whitespace-nowrap"
         >
           {siteConfig.name}
@@ -42,7 +56,7 @@ export default function SiteNav() {
         {links.map((l) => (
           <Link
             key={l.href}
-            href={sitePath(l.href)}
+            href={l.href}
             className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
           >
             {l.label}
