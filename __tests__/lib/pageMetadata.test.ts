@@ -38,7 +38,8 @@ describe('pageMetadata', () => {
   // the layout sets and this helper forgets is simply absent from the page.
   it('carries the shared social fields through from siteMetadata', () => {
     expect(meta.openGraph?.siteName).toBe(siteMetadata.openGraph?.siteName)
-    expect(meta.openGraph?.type).toBe('website')
+    // Cast: `type` is only on some members of Next's OpenGraph union.
+    expect((meta.openGraph as { type?: string }).type).toBe('website')
     expect(meta.openGraph?.images).toBe(siteMetadata.openGraph?.images)
     expect(meta.openGraph?.images).toBeDefined()
     expect((meta.twitter as { card?: string }).card).toBe('summary_large_image')
