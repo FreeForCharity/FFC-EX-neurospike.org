@@ -49,8 +49,7 @@ const Footer: React.FC = () => {
               href={siteConfig.guidestar.directProfileUrl}
               className="group relative my-4 flex w-full max-w-[230px] items-center justify-between
                 border-2 border-[#2ea3f2] bg-black px-5 py-2.5 text-[#2ea3f2]
-                transition-all duration-300 hover:border-transparent"
-              id="aria-font"
+                transition-all duration-300 hover:border-transparent aria-font"
             >
               <span className="text-[17px] font-medium leading-tight sm:text-[18px] md:text-[20px] transition-transform duration-300 group-hover:-translate-x-1">
                 Direct GuideStar Profile Link
@@ -76,19 +75,16 @@ const Footer: React.FC = () => {
 
           <ul className="space-y-2 text-sm" id="lato-font">
             {[
-              // Adopters: edit these labels and anchors to match your own
-              // site's sections. This footer-only template ships no page
-              // sections besides the team block, so the anchors below are
-              // conventional section ids a charity site typically adds
-              // (matching the FFC Single Page template's sections).
-              { name: 'Home', href: '/#hero' },
-              { name: 'Mission', href: '/#mission' },
-              { name: 'Programs', href: '/#programs' },
-              { name: 'Events', href: '/#events' },
-              { name: 'Donate', href: '/#donate' },
-              { name: 'Volunteer', href: '/#volunteer' },
-              { name: 'FAQ', href: '/#faq' },
-              { name: 'Team', href: '/#team' },
+              // These mirror the real routes this site serves (which are the
+              // five pages lifted from the source Google Site). The template's
+              // defaults were anchors -- /#mission, /#programs, /#donate and
+              // friends -- to sections this site does not have, so every one of
+              // them was a dead link that still rendered as a working one.
+              { name: 'Executive Summary', href: '/' },
+              { name: 'Org & Leadership', href: '/org-leadership' },
+              { name: 'Other Research: CNAGI', href: '/other-research-cnagi' },
+              { name: 'Media & About', href: '/media-about' },
+              { name: 'Substacky', href: '/substacky' },
               // FFC footer standard: every supported charity site links back
               // to the supporting org's hub. Always rendered — keep this
               // entry when customizing a fork.
@@ -183,27 +179,34 @@ const Footer: React.FC = () => {
                 <p className="font-[500] text-[22px]">E-mail</p>
                 <a
                   href={`mailto:${siteConfig.contactEmail}`}
-                  className="font-[500] text-[15px] hover:text-cyan-400 transition-colors break-all"
-                  id="aria-font"
+                  className="aria-font font-[500] text-[15px] hover:text-cyan-400 transition-colors break-all"
                 >
                   {siteConfig.contactEmail}
                 </a>
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <Phone className="w-10 h-10 text-orange-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-[500] text-[22px]">Call Us Today</p>
-                <a
-                  href={`tel:${siteConfig.phone.tel}`}
-                  className="font-[500] text-[16px] hover:text-cyan-400 transition-colors"
-                  id="aria-font"
-                >
-                  {siteConfig.phone.display}
-                </a>
+            {/*
+              Rendered only when a number is actually configured. A charity with
+              no published phone number leaves siteConfig.phone empty, and an
+              empty `tel:` link is worse than an absent one: it still looks
+              callable to a sighted user and is still announced as a phone link
+              by a screen reader, but dials nothing.
+            */}
+            {siteConfig.phone.tel.trim() && siteConfig.phone.display.trim() && (
+              <div className="flex items-start gap-3">
+                <Phone className="w-10 h-10 text-orange-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-[500] text-[22px]">Call Us Today</p>
+                  <a
+                    href={`tel:${siteConfig.phone.tel.trim()}`}
+                    className="aria-font font-[500] text-[16px] hover:text-cyan-400 transition-colors"
+                  >
+                    {siteConfig.phone.display}
+                  </a>
+                </div>
               </div>
-            </div>
+            )}
 
             {siteConfig.addresses.map((address) => (
               <a
@@ -216,7 +219,7 @@ const Footer: React.FC = () => {
                 <MapPin className="w-10 h-10 text-orange-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-[500] text-[22px]">{address.label}</p>
-                  <p className="font-[500] text-[16px]" id="aria-font">
+                  <p className="aria-font font-[500] text-[16px]">
                     {address.lines.map((line, index) => (
                       <React.Fragment key={line}>
                         {line}
@@ -254,10 +257,7 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div
-        className="mt-12 py-6 px-4 border-t border-gray-800 text-center text-[18px] font-[500] w-full"
-        id="aria-font"
-      >
+      <div className="aria-font mt-12 py-6 px-4 border-t border-gray-800 text-center text-[18px] font-[500] w-full">
         <p>
           © {currentYear} All Rights Are Reserved by {siteConfig.name} a US 501c3 Non Profit
           {/* FFC footer standard: the "Supported by Free For Charity" attribution

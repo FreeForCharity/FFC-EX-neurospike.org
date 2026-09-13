@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { siteUrl } from '@/lib/site.config'
+import { siteConfig, siteUrl } from '@/lib/site.config'
 
 export const metadata: Metadata = {
-  title: 'Donation Policy | Free For Charity',
-  description: 'Donation Policy for Free For Charity website',
+  title: 'Donation Policy',
+  description: `Donation Policy for ${siteConfig.name}`,
   // Own canonical: without it Next inherits the layout's, which points at the home page.
   alternates: { canonical: siteUrl('/donation-policy') },
 }
@@ -25,7 +25,7 @@ export default function DonationPolicy() {
             Tax Deductibility
           </h2>
           <p>
-            Free For Charity is a qualified 501(c)(3) nonprofit organization (EIN: 46-2471893).
+            {siteConfig.name} is a qualified 501(c)(3) public charity (EIN: {siteConfig.ein}).
             Donations are tax-deductible to the full extent allowed by law.
           </p>
 
@@ -33,13 +33,12 @@ export default function DonationPolicy() {
             Use of Donations
           </h2>
           <p>
-            Donations support our mission to reduce costs and increase revenues for nonprofits by
-            providing:
+            Donations support {siteConfig.name}&apos;s mission and the work described on this site,
+            including:
           </p>
           <ul>
-            <li>Free domain registration and hosting services</li>
-            <li>Technology consultation and support</li>
-            <li>Volunteer coordination and training</li>
+            <li>Our research and program activities</li>
+            <li>The tools, data and infrastructure that work depends on</li>
             <li>Administrative costs necessary to operate our programs</li>
           </ul>
 
@@ -73,14 +72,9 @@ export default function DonationPolicy() {
           <p>For questions about donations or this policy, please contact us at:</p>
           <p>
             Email:{' '}
-            <a
-              href="mailto:clarkemoyer@freeforcharity.org"
-              className="text-primary hover:underline"
-            >
-              clarkemoyer@freeforcharity.org
+            <a href={`mailto:${siteConfig.contactEmail}`} className="text-primary hover:underline">
+              {siteConfig.contactEmail}
             </a>
-            <br />
-            Phone: (520) 222-8104
           </p>
         </div>
       </div>

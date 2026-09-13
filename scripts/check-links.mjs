@@ -7,16 +7,40 @@
  * `out/privacy-policy/index.html`. Serving `out/` locally keeps CI aligned with
  * the deployed static host without requiring a live deployment.
  *
- * .linkinatorrc.json skips the site's own production origin
- * (siteConfig.url). Pages now carry self-referential <link rel="canonical">
- * tags pointing at that origin, and checking them would validate the build
- * against the PREVIOUS deployment — a page added in this commit would always
- * 404 until it ships. Same-origin coverage comes from the local server above.
+ * The site's own production origin is skipped. Pages carry self-referential
+ * <link rel="canonical"> tags pointing at that origin, and checking them would
+ * validate the build against the PREVIOUS deployment — a page added in this
+ * commit would always 404 until it ships. Same-origin coverage comes from the
+ * local server above.
+ *
+ * Two content links are deliberately NOT skipped, because both look like they
+ * were truncated when this site's content was lifted, and a skip would retire
+ * the only thing reporting them (CI run 34720667537):
+ *
+ *  - a docs.google.com document id of 33 characters where every other link on
+ *    the site carries the standard 44. It answers 401 while five sibling
+ *    document links on the same site answer 200, so the host is not blocking
+ *    us — that one id does not resolve to a readable document.
+ *  - an nytimes.com article path ending `-fate-7` with no `.html`. NYT answers
+ *    403 for dated article paths from both this network and GitHub's runners,
+ *    so the status alone proves nothing, but the shape matches the truncation
+ *    above.
+ *
+ * Both need a human with the original source to repair; masking them would
+ * make the check quieter and less true.
+ *
+ * The own-origin skip is DERIVED from src/lib/site.config.ts at run time rather than
+ * written into .linkinatorrc.json. The hardcoded form named the template
+ * placeholder host, so the first charity to set its own siteConfig.url
+ * silently started link-checking its own canonicals against a host that does
+ * not serve this build yet — 37 "broken links" that are all the site itself.
  */
 import { spawn } from 'node:child_process'
-import { createReadStream } from 'node:fs'
+import { createReadStream, readFileSync, writeFileSync } from 'node:fs'
 import { access, stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
+import { mkdtempSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { dirname, extname, isAbsolute, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -24,6 +48,7 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(SCRIPT_DIR, '..')
 const DEFAULT_OUT_DIR = join(ROOT, 'out')
 const DEFAULT_CONFIG_PATH = join(ROOT, '.linkinatorrc.json')
+const SITE_CONFIG_PATH = join(ROOT, 'src', 'lib', 'site.config.ts')
 const HOST = '127.0.0.1'
 
 const CONTENT_TYPES = new Map([
@@ -174,6 +199,61 @@ export async function createStaticExportServer(outDir = DEFAULT_OUT_DIR) {
   }
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * The skip pattern for this site's own canonical origin, read from
+ * src/lib/site.config.ts.
+ *
+ * Anchored to two-space indentation so it cannot pick up a nested `url:` —
+ * `supportedBy.url` sits at four spaces and is a genuinely external link that
+ * SHOULD be checked. Returns null when the property is absent or unparseable;
+ * the caller then falls back to the committed config rather than silently
+ * skipping nothing.
+ */
+export function ownOriginSkipPattern(siteConfigSource) {
+  const matches = [...siteConfigSource.matchAll(/^ {2}url:\s*'([^']+)',?$/gm)]
+  if (matches.length !== 1) return null
+
+  try {
+    return `^${escapeRegExp(new URL(matches[0][1]).origin)}(/.*)?$`
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Merge the derived own-origin skip into the committed linkinator config and
+ * write the result to a temp file, whose path is returned. The committed file
+ * stays the editable source of truth; this only adds what must not be
+ * hand-maintained.
+ */
+export function resolveLinkinatorConfig(
+  configPath = DEFAULT_CONFIG_PATH,
+  siteConfigPath = SITE_CONFIG_PATH
+) {
+  let pattern = null
+  try {
+    pattern = ownOriginSkipPattern(readFileSync(siteConfigPath, 'utf8'))
+  } catch {
+    pattern = null
+  }
+
+  if (!pattern) return configPath
+
+  const config = JSON.parse(readFileSync(configPath, 'utf8'))
+  const skip = Array.isArray(config.skip) ? config.skip : []
+  if (skip.includes(pattern)) return configPath
+
+  const merged = { ...config, skip: [...skip, pattern] }
+  const dir = mkdtempSync(join(tmpdir(), 'ffc-linkinator-'))
+  const mergedPath = join(dir, 'linkinatorrc.json')
+  writeFileSync(mergedPath, `${JSON.stringify(merged, null, 2)}\n`)
+  return mergedPath
+}
+
 export function linkinatorArgs(url, configPath = DEFAULT_CONFIG_PATH) {
   return [url, '--recurse', '--config', configPath]
 }
@@ -206,7 +286,9 @@ export async function runLinkinator(url, options = {}) {
 
 async function main() {
   const outDir = resolve(process.env.FFC_CHECK_LINKS_OUT_DIR || DEFAULT_OUT_DIR)
-  const configPath = resolve(process.env.FFC_CHECK_LINKS_CONFIG || DEFAULT_CONFIG_PATH)
+  const configPath = resolveLinkinatorConfig(
+    resolve(process.env.FFC_CHECK_LINKS_CONFIG || DEFAULT_CONFIG_PATH)
+  )
   const server = await createStaticExportServer(outDir)
 
   try {
