@@ -2,12 +2,20 @@ import { siteConfig, siteUrl } from '@/lib/site.config'
 import { assetPath } from '@/lib/assetPath'
 
 /**
- * schema.org `NGO` JSON-LD for this charity, derived entirely from
- * src/lib/site.config.ts.
+ * schema.org `NGO` JSON-LD for this charity.
  *
- * Every value here already exists in config and is already published on the
- * site in human-readable form; nothing is invented and nothing new has to be
- * maintained. The point is to make the same facts machine-readable, so a
+ * Every value that identifies the organization -- name, url, description,
+ * email, logo, `taxID`, `sameAs` -- is read from src/lib/site.config.ts, and
+ * each already appears on the site in human-readable form; nothing is
+ * invented and nothing new has to be maintained.
+ *
+ * THREE VALUES ARE DECIDED HERE, NOT CONFIGURED: `@context`, `@type`
+ * (see the NGO note below) and `nonprofitStatus`. They are schema-level
+ * choices rather than site facts, and SiteConfig has no field for any of
+ * them. If a fork is not a US 501(c)(3), `nonprofitStatus` is wrong for it
+ * and must be changed here -- it will not follow from config.
+ *
+ * The point is to make facts the site already states machine-readable, so a
  * search engine or a charity aggregator can connect this site to the verified
  * nonprofit records rather than treating them as unrelated pages:
  *

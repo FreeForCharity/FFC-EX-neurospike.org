@@ -2,9 +2,12 @@ import { organizationSchema } from '../../src/lib/organizationSchema'
 import { siteConfig, siteUrl } from '../../src/lib/site.config'
 
 describe('organization JSON-LD', () => {
-  // Every assertion reads from siteConfig rather than repeating a literal, so a
-  // rebrand cannot make this suite red for a correct site — the same rule the
-  // rest of this suite follows.
+  // IDENTITY fields are asserted against siteConfig rather than repeated as
+  // literals, so a rebrand cannot make this suite red for a correct site.
+  // Schema constants -- `@context`, `@type`, `nonprofitStatus` -- are asserted
+  // as literals on purpose: they are not config-derived, and pinning them is
+  // the point (a silent change to `nonprofitStatus` would misstate the
+  // organization's tax status to every consumer of the markup).
   it('derives identity from siteConfig', () => {
     const schema = organizationSchema()
 
