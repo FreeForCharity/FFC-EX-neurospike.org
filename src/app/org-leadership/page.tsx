@@ -4,6 +4,7 @@ import React from 'react'
 import { PageShell, PageTitle, H2, H3, P, UL, A, Lede } from '@/components/content'
 import TeamMemberCard from '@/components/ui/TeamMemberCard'
 import { team } from '@/data/team'
+import { siteConfig } from '@/lib/site.config'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Org & Leadership',
@@ -84,6 +85,28 @@ export default function OrgLeadership() {
           />
         ))}
       </div>
+
+      {/*
+        Restored from the source Google Sites page, where it closed the
+        Project Lead section. The conversion dropped it, and with it the only
+        statement of the STATE OF INCORPORATION anywhere on the site -- the
+        501(c)(3) status and the EIN survived in the footer and the JSON-LD,
+        "California" did not.
+
+        "NeuroSpike Corporation" is the legal name on the IRS determination,
+        deliberately spelled differently from siteConfig.name ("Neurospike
+        FRO"), which is the public branding -- see the note beside `ein` in
+        site.config.ts. A legal-status sentence has to use the legal name, so
+        this one string is exempt from the brand normalisation in #22. The EIN
+        and the Candid link are read from config so they cannot drift from the
+        footer's copies.
+      */}
+      <H2 id="legal-status">Legal status</H2>
+      <P>
+        NeuroSpike Corporation is a California non-profit corporation and an IRS 501(c)(3) public
+        charity, EIN {siteConfig.ein}. Verify our status on our{' '}
+        <A href={siteConfig.guidestar.directProfileUrl}>Candid profile</A>.
+      </P>
 
       <H2 id="links">Links</H2>
       <UL>
