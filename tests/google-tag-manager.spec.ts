@@ -30,6 +30,15 @@ async function waitForDataLayer(page: import('@playwright/test').Page) {
 }
 
 test.describe('Google Tag Manager Integration', () => {
+  // Every FFC site starts with no container: one is provisioned later by
+  // workflows 505/503. Until then the components correctly render nothing, so
+  // waiting for a gtm-script element would time out after 15s per test and
+  // report a red suite for a site that is behaving exactly as designed.
+  test.skip(
+    !testConfig.googleTagManager.configured,
+    'No GTM container is configured for this site yet (src/lib/analytics.config.ts GTM_ID is empty).'
+  )
+
   test('should initialize dataLayer on page load', async ({ page }) => {
     await page.goto('/')
     await waitForDataLayer(page)
@@ -170,6 +179,15 @@ test.describe('Google Tag Manager Integration', () => {
 })
 
 test.describe('Google Tag Manager Configuration', () => {
+  // Same gate as the Integration block above: with no container provisioned the
+  // components render nothing, and this would wait 15s for a script that must
+  // not exist. Both describes need it — skipping only the first one is what
+  // made the local E2E run red while the unit suite was green.
+  test.skip(
+    !testConfig.googleTagManager.configured,
+    'No GTM container is configured for this site yet (src/lib/analytics.config.ts GTM_ID is empty).'
+  )
+
   test('should load GTM script with configured ID', async ({ page }) => {
     await page.goto('/')
     await waitForGtmScript(page)

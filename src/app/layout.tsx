@@ -1,5 +1,6 @@
 import './globals.css'
 import Footer from './../components/footer'
+import SiteNav from '@/components/site-nav'
 import CookieConsent from './../components/cookie-consent'
 import GoogleTagManager, { GoogleTagManagerNoScript } from './../components/google-tag-manager'
 import { siteConfig } from '@/lib/site.config'
@@ -15,6 +16,7 @@ import {
 } from '@/lib/fonts'
 import { siteMetadata } from '@/lib/siteMetadata'
 import { assetPath } from '@/lib/assetPath'
+import { organizationSchema } from '@/lib/organizationSchema'
 import { CONSENT_MODE_BOOTSTRAP } from '@/lib/consent-mode'
 
 export const metadata = siteMetadata
@@ -47,6 +49,23 @@ export default function RootLayout({
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="color-scheme" content="light" />
         <meta name="theme-color" content={siteConfig.themeColor} />
+
+        {/*
+          schema.org NGO data, derived from site.config.ts. Emitted with
+          dangerouslySetInnerHTML because JSON-LD must reach the page as raw
+          JSON -- React would otherwise escape the quotes and consumers would
+          see a string rather than an object. The content is our own config,
+          not user input; the `<` replacement below is what keeps a stray `<`
+          from closing the script tag early -- JSON.stringify does not escape
+          it, and `<` is a valid JSON escape that parsers decode back to
+          `<`.
+        */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema()).replace(/</g, '\\u003c'),
+          }}
+        />
 
         {/* Preconnect to external domains for faster resource loading */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
@@ -91,6 +110,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         {/* <PopupProvider> */}
+        <SiteNav />
         {children}
         <Footer />
         <CookieConsent />
