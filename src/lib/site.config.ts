@@ -1,5 +1,5 @@
 /**
- * Central site configuration for Free For Charity template sites.
+ * Central site configuration for this FFC-supported charity site.
  *
  * EDIT THIS FILE to customize a new FFC-supported nonprofit site.
  * Most values that vary between sites flow from here so pages, metadata,
@@ -82,7 +82,7 @@ export type SiteConfig = {
   vulnerabilityDisclosurePath: string
   /** Social links displayed in the footer. */
   social: readonly SiteSocialLink[]
-  /** IRS Employer Identification Number (tax ID), e.g. '46-2471893'. */
+  /** IRS Employer Identification Number (tax ID), e.g. '12-3456789'. */
   ein: string
   /**
    * Primary phone number. `display` is the human-readable form shown to users;
@@ -111,62 +111,87 @@ export type SiteConfig = {
 }
 
 export const siteConfig: SiteConfig = {
-  name: 'Free For Charity',
-  tagline: 'Reduce Costs, Increase Impact',
+  name: 'Neurospike FRO',
+  tagline: 'A Focused Research Organization',
   description:
-    'Free For Charity connects students, professionals, and businesses with nonprofits to reduce costs and increase revenues—putting more resources back into their missions.',
+    'Neurospike is a Focused Research Organization studying Age-Related Fast-Spike Neuron Decline (FSND) as a unifying paradigm for age-related functional decline, developed translation-ready and in silico.',
   shortDescription:
-    'Connecting students, professionals, and businesses with nonprofits to reduce costs and increase revenues.',
-  url: 'https://ffcworkingsite1.org',
-  twitterHandle: '@freeforcharity',
-  contactEmail: 'clarkemoyer@freeforcharity.org',
+    'A Focused Research Organization studying Age-Related Fast-Spike Neuron Decline as a unifying paradigm for age-related functional decline.',
+  // Bare origin, no path -- enforced by scripts/check-drift.mjs. The GitHub
+  // Pages base path is applied separately, by sitePath(), so this value is the
+  // ORIGIN and sitePath() supplies the rest.
+  //
+  // It therefore does NOT stay correct across the custom-domain cutover, which
+  // an earlier version of this comment claimed. siteUrl() returns
+  // `url + sitePath(path)`, so an apex origin while the deploy is still on the
+  // project path yields `https://neurospike.org/FFC-EX-neurospike.org/...` --
+  // a URL neither host serves.
+  //
+  // neurospike.org is not registered as of 2026-09-12: the .org registry
+  // returns NXDOMAIN for it, so there is no zone to point at GitHub Pages and
+  // no public/CNAME can be added yet. Until it exists this site is served only
+  // at https://freeforcharity.github.io/FFC-EX-neurospike.org/, and that is
+  // what canonicals, the sitemap, robots and security.txt must advertise.
+  //
+  // TO CUT OVER, in one change: register the domain and point apex + www at
+  // GitHub Pages, add `public/CNAME` containing `neurospike.org`, set this to
+  // 'https://neurospike.org', and rerun `npm run check:drift` -- checkDeployOrigin
+  // fails if either half is done without the other.
+  url: 'https://freeforcharity.github.io',
+  twitterHandle: '',
+  contactEmail: 'rlee@codex.stanford.edu',
   keywords: [
-    'nonprofit',
-    'charity',
-    'volunteer',
-    'donate',
-    'free hosting',
-    'domains',
-    'Microsoft 365',
+    'focused research organization',
+    'FRO',
+    'neuroscience',
+    'fast-spike neurons',
+    'FSND',
+    'aging',
+    'computational biology',
+    'in silico',
   ],
-  themeColor: '#ffffff',
+  themeColor: '#0b1020',
   vulnerabilityDisclosurePath: '/vulnerability-disclosure-policy',
   social: [
-    { label: 'Facebook', href: 'https://www.facebook.com/freeforcharity' },
-    { label: 'X (Twitter)', href: 'https://x.com/freeforcharity1' },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/company/freeforcharity/' },
-    // Repo name uses underscores — the hyphenated variant 404s.
-    { label: 'GitHub', href: 'https://github.com/FreeForCharity/FFC-IN-Footer_Only_Template' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/goldspruce' },
+    { label: 'GitHub', href: 'https://github.com/goldspruce' },
+    { label: 'Personal site', href: 'https://fl0wstate.com/neuro/' },
+    { label: 'ORCID', href: 'https://orcid.org/0000-0003-4074-2247' },
   ],
-  ein: '46-2471893',
-  phone: { display: '(520) 222-8104', tel: '5202228104' },
+  // Verified against the organization's Candid profile 2026-09-12:
+  // https://app.candid.org/profile/16713649/neurospike-42-2753465
+  // Tax status there reads "501(c)(3) Public Charity". Note the legal name on
+  // the determination is "NeuroSpike"; `name` above is the site's own branding
+  // ("Neurospike FRO"), which is what every page of the source site uses.
+  ein: '42-2753465',
+  // No phone number appears on the source site or on the Candid profile. Empty
+  // strings are the configured "this charity publishes no phone number" state:
+  // the footer omits the whole Call Us block rather than rendering a `tel:`
+  // link that looks callable and dials nothing. Fill both fields in if and when
+  // Neurospike publishes a number.
+  phone: { display: '', tel: '' },
+  // From the Candid profile (the source website publishes no address).
   addresses: [
     {
       label: 'Main Address',
-      lines: ['4030 Wake Forrest Road', 'Suite 349 Raleigh North', 'Carolina 27609'],
+      lines: ['18516 Garnet Ln', 'Morgan Hill, CA 95037', 'United States'],
       mapUrl:
-        'https://www.google.com/maps/search/?api=1&query=4030+Wake+Forrest+Road+Suite+349+Raleigh+NC+27609',
-    },
-    {
-      label: 'PA Office Address',
-      lines: ['301 Science Park Road Suite', '119 State College PA 16803'],
-      mapUrl:
-        'https://www.google.com/maps/place/Free+For+Charity/@40.7768455,-77.8963305,17z/data=!3m1!4b1!4m6!3m5!1s0x89cea944b44a2e01:0x6fc2d6bf09e00a0f!8m2!3d40.7768415!4d-77.8937556!16s%2Fg%2F11vzvbl2d7?entry=ttu&g_ep=EgoyMDI1MTEyMy4xIKXMDSoASAFQAw%3D%3D',
+        'https://www.google.com/maps/search/?api=1&query=18516+Garnet+Ln+Morgan+Hill+CA+95037',
     },
   ],
+  // Both verified 200 on 2026-09-12. `directProfileUrl` uses the canonical
+  // Candid app URL rather than the `?pkId=...` form, which carries a session
+  // parameter that should not be published.
   guidestar: {
-    profileUrl: 'https://www.guidestar.org/profile/46-2471893',
-    directProfileUrl:
-      'https://www.guidestar.org/profile/shared/bbbe173a-87b9-4af9-a8a2-cae255a95742',
+    profileUrl: 'https://www.guidestar.org/profile/42-2753465',
+    directProfileUrl: 'https://app.candid.org/profile/16713649/neurospike-42-2753465',
   },
   supportedBy: {
     name: 'Free For Charity',
     url: 'https://freeforcharity.org',
     hubUrl: 'https://freeforcharity.org/hub/',
   },
-  // parentOrg is intentionally unset: this template is for standalone
-  // charities by default. Set it only for a genuine "a project of"
-  // fiscal-sponsorship relationship.
+  // parentOrg is intentionally unset: Neurospike is a standalone FRO.
 }
 
 function configuredBasePath(): string {
