@@ -38,7 +38,7 @@ export default function Substacky() {
       <H2 id="y2024">2024</H2>
       <UL>
         <li>
-          <A href="https://docs.google.com/document/d/1YNvbrRFM_PBrxIykz9Cf_wFsDX34gd76">
+          <A href="https://docs.google.com/document/d/1YNvbrRFM_PBrxIykz9Cf_wFsDX34gd76/edit">
             How To Raise $$ If You Didn&apos;t Go to Stanford or Have Rich Friends
           </A>
         </li>
