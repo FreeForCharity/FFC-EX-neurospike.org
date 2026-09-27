@@ -1,5 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import { assetPath } from '@/lib/assetPath'
 import { siteConfig } from '@/lib/site.config'
 
 /**
@@ -63,10 +65,31 @@ export default function SiteNav() {
       style={{ backgroundColor: NAV_BG }}
     >
       <div className="w-[94%] xl:w-[88%] mx-auto flex flex-wrap items-center gap-x-[24px] gap-y-[2px] py-[12px]">
+        {/*
+          The brand mark, contributed by @goldspruce in #39. It arrived as an
+          orphan file -- committed to public/Images/ and referenced by nothing
+          -- so until this wiring it was work the charity did that the site
+          never showed. It is decorative here: the site name sits beside it as
+          real text, so alt="" keeps a screen reader from announcing the same
+          link twice.
+
+          assetPath() is required for /Images/... references (see
+          ContentImage.tsx and the guard in scripts/check-drift.mjs). The href
+          stays BARE -- next/link applies basePath itself; see the warning at
+          the top of this file.
+        */}
         <Link
           href="/"
-          className="text-[15px] font-[600] text-white no-underline mr-auto whitespace-nowrap"
+          className="flex items-center gap-[10px] text-[15px] font-[600] text-white no-underline mr-auto whitespace-nowrap"
         >
+          <Image
+            src={assetPath('/Images/neurospike-logo.png')}
+            alt=""
+            width={30}
+            height={30}
+            className="h-[30px] w-[30px]"
+            priority
+          />
           {siteConfig.name}
         </Link>
         {links.map((l) =>
