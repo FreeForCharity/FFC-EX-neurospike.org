@@ -78,10 +78,21 @@ describe('Policy page rendering', () => {
     expect(screen.getByText('Refund Policy')).toBeInTheDocument()
   })
 
-  it('Donation Policy has a contact email link', () => {
+  // getAllByText, not getByText: the page carries the contact address more than
+  // once (the "How to Donate" section added in #39 offers it for cheque/wire
+  // giving, and the contact section below already did). getByText THROWS on a
+  // second match, so the single-element form made a legitimate content addition
+  // look like a regression. Asserting over every match is also the stronger
+  // check -- one address rendered as plain text rather than a mailto link would
+  // now fail, where before only the first occurrence was ever examined.
+  it('Donation Policy renders every contact email as a mailto link', () => {
     render(<DonationPolicyPage />)
-    const emailLink = screen.getByText(siteConfig.contactEmail)
-    expect(emailLink.closest('a')).toHaveAttribute('href', `mailto:${siteConfig.contactEmail}`)
+    const emails = screen.getAllByText(siteConfig.contactEmail)
+
+    expect(emails.length).toBeGreaterThan(0)
+    for (const email of emails) {
+      expect(email.closest('a')).toHaveAttribute('href', `mailto:${siteConfig.contactEmail}`)
+    }
   })
 
   it('Security Acknowledgements renders heading', () => {

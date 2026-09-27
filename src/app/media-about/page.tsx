@@ -42,7 +42,7 @@ export default function MediaAbout() {
           <A href="https://www.cnn.com/2013/11/18/us/free-diver-death">CNN</A>
         </li>
         <li>
-          <A href="https://www.nytimes.com/2013/11/19/sports/testing-limits-of-a-niche-sport-diver-met-fate-7">
+          <A href="https://www.nytimes.com/2013/11/19/sports/testing-limits-of-a-niche-sport-diver-met-fate-72-meters-down.html?unlocked_article_code=1.EFE.4MyL.5wS_9qOkwbYK">
             The New York Times
           </A>
         </li>

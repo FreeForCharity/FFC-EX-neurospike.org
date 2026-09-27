@@ -31,7 +31,23 @@ import { siteConfig } from '@/lib/site.config'
 
 const NAV_BG = '#a3201c'
 
-const links = [
+/**
+ * `external: true` renders a raw <a target="_blank" rel="noopener noreferrer">
+ * instead of a next/link. It is deliberately kept with no entry using it yet.
+ *
+ * It arrived in #39 carrying a "The Latest From NeuroSpike" item pointed at
+ * https://sites.google.com/view/neurospike/ -- the Google Site this repo was
+ * migrated OFF. That target was removed rather than shipped: the migration's
+ * measured result was zero sites.google.com and zero googleusercontent
+ * references in the deployed pages, and a nav link is the single most
+ * prominent place to undo that. It would also send visitors from the new site
+ * back to the old one, where content diverges the moment either is edited.
+ *
+ * The MECHANISM is right and is kept for when there is a destination we
+ * control -- a real Substack, say. Wiring one is a single entry here. Do not
+ * re-point it at the Google Site.
+ */
+const links: { label: string; href: string; external?: boolean }[] = [
   { label: 'Neurospike', href: '/' },
   { label: 'Org & Leadership', href: '/org-leadership' },
   { label: 'Other Research: CNAGI', href: '/other-research-cnagi' },
@@ -53,15 +69,27 @@ export default function SiteNav() {
         >
           {siteConfig.name}
         </Link>
-        {links.map((l) => (
-          <Link
-            key={l.href}
-            href={l.href}
-            className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
-          >
-            {l.label}
-          </Link>
-        ))}
+        {links.map((l) =>
+          l.external ? (
+            <a
+              key={l.href}
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
+            >
+              {l.label}
+            </a>
+          ) : (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
+            >
+              {l.label}
+            </Link>
+          )
+        )}
       </div>
     </nav>
   )
