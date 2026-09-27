@@ -37,10 +37,21 @@ function readWorkflow(): string {
   return readFileSync(WORKFLOW, 'utf8')
 }
 
-/** Top-level job ids: two-space indented keys under `jobs:`. */
+/**
+ * Top-level job ids: two-space indented keys under `jobs:`.
+ *
+ * The explicit `jobs:` assertion is not defensive noise. Without it,
+ * `indexOf` returns -1 on a miss, `slice(-1)` takes the LAST CHARACTER of the
+ * file, and the function returns an empty array — so a reformatted workflow
+ * would make every assertion below vacuously true rather than failing where
+ * the problem is. An empty derived set is exactly how a derived test stops
+ * testing anything. Raised by Copilot on #42.
+ */
 function jobNames(source: string): string[] {
-  const jobsBlock = source.slice(source.indexOf('\njobs:'))
-  return [...jobsBlock.matchAll(/^ {2}([a-z][a-z0-9-]*):$/gm)].map((match) => match[1])
+  const jobsAt = source.indexOf('\njobs:')
+  expect(jobsAt).toBeGreaterThan(-1)
+
+  return [...source.slice(jobsAt).matchAll(/^ {2}([a-z][a-z0-9-]*):$/gm)].map((match) => match[1])
 }
 
 /** The value of a key inside a named job, e.g. `needs` or `if`. */
@@ -62,9 +73,17 @@ describe('deploy.yml failure notification', () => {
   const jobs = jobNames(source)
   const pipeline = jobs.filter((job) => job !== 'notify-failure')
 
-  it('has the pipeline this test thinks it has', () => {
+  // `toContain`, not `toEqual`. An exact list contradicted the derived design
+  // of everything below it: adding a third stage AND covering it correctly
+  // would still have failed here, so the test punished the change it exists
+  // to encourage. The derived loops enforce full coverage on their own — this
+  // only pins that the two stages the notification is about still exist, so a
+  // renamed or deleted job fails loudly instead of shrinking the set the
+  // loops iterate. Raised by Copilot on #42.
+  it('still has the two stages this notification is about', () => {
     expect(jobs).toContain('notify-failure')
-    expect(pipeline).toEqual(['build', 'deploy'])
+    expect(pipeline).toContain('build')
+    expect(pipeline).toContain('deploy')
   })
 
   it('depends on every pipeline job, not just the last one', () => {

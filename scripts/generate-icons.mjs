@@ -104,9 +104,19 @@ export function iconElement(dataUri, size, background) {
  * is 6 bytes, then one 16-byte directory entry per image, then the payloads.
  *
  * A 256px image is written as 0 in the width/height bytes -- those fields are
- * a single byte each, so 256 does not fit. Nothing here reaches 256, but the
- * modulo is kept because omitting it is how this function would silently
- * write a corrupt entry if a larger size were ever added to FAVICON_SIZES.
+ * a single byte each, so 256 does not fit.
+ *
+ * THIS USED TO SAY `size % 256`, AND THE COMMENT CLAIMED THE MODULO WAS THE
+ * PROTECTION. It was the opposite. `Buffer.writeUInt8` already throws on
+ * anything above 255, so the modulo did not guard against a corrupt entry --
+ * it DISABLED the guard that was already there, and a 512 would have been
+ * written as 0, which an ICO reader interprets as 256. That is exactly the
+ * silent corruption the comment said it prevented, caused by the line the
+ * comment was defending. Raised by Copilot on #41.
+ *
+ * The range is now checked explicitly, so an unsupported size fails with a
+ * message naming it rather than with a RangeError from Buffer, and 256 keeps
+ * its documented encoding.
  */
 export function buildIco(pngs) {
   if (pngs.length === 0) throw new Error('buildIco: no images')
@@ -120,9 +130,16 @@ export function buildIco(pngs) {
   let offset = header.length + directory.length
 
   pngs.forEach(({ size, bytes }, index) => {
+    if (!Number.isInteger(size) || size < 1 || size > 256) {
+      throw new Error(`buildIco: ${size} is not a valid icon size (1-256)`)
+    }
+
+    // 256 is the one size that does not fit the byte, and ICO spells it 0.
+    const encoded = size === 256 ? 0 : size
+
     const entry = index * 16
-    directory.writeUInt8(size % 256, entry + 0) // width  (0 means 256)
-    directory.writeUInt8(size % 256, entry + 1) // height
+    directory.writeUInt8(encoded, entry + 0) // width  (0 means 256)
+    directory.writeUInt8(encoded, entry + 1) // height
     directory.writeUInt8(0, entry + 2) // palette size: 0 = truecolour
     directory.writeUInt8(0, entry + 3) // reserved
     directory.writeUInt16LE(1, entry + 4) // colour planes
@@ -154,6 +171,20 @@ async function renderPng(dataUri, size, background) {
 // Guarded so the exports above can be imported by a test without rendering.
 if (import.meta.url === `file://${process.argv[1]}`) {
   const source = await readFile(SOURCE)
+
+  // The data URI below DECLARES image/png, so a source that is not one is a
+  // lie satori has to discover at render time. This is not hypothetical here:
+  // the mark arrived in #39 as a JPEG named .png-adjacent, and recovering a
+  // real PNG from it is the entire reason this file exists. If it is ever
+  // replaced with a JPEG again, fail on the byte that says so rather than on
+  // whatever the renderer does with it. Raised by Copilot on #41.
+  if (!isPng(source)) {
+    throw new Error(
+      `${path.relative(ROOT, SOURCE)} is not a PNG. The icons are rendered from it as ` +
+        `image/png; convert the source before regenerating.`
+    )
+  }
+
   const dataUri = `data:image/png;base64,${source.toString('base64')}`
 
   for (const { file, size, background } of ICON_TARGETS) {
