@@ -39,8 +39,17 @@ const declaredFiles = [...source.matchAll(/path:\s*'\.\.\/fonts\/([^']+)'/g)].ma
   (match) => match[1]
 )
 
-/** Everywhere a `var(--font-*)` is actually consumed. */
+/**
+ * Everywhere a `var(--font-*)` is actually consumed.
+ *
+ * Memoized: the scan walks all of src/ and is called by two tests, and the
+ * answer cannot change within one jest run.
+ */
+let consumedCache: Map<string, string[]> | null = null
+
 function consumedVariables(): Map<string, string[]> {
+  if (consumedCache) return consumedCache
+
   const found = new Map<string, string[]>()
   const files = [
     join(ROOT, 'src', 'app', 'globals.css'),
@@ -53,6 +62,8 @@ function consumedVariables(): Map<string, string[]> {
       found.set(match[1], [...(found.get(match[1]) ?? []), file])
     }
   }
+
+  consumedCache = found
   return found
 }
 

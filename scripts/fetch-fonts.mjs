@@ -128,6 +128,18 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const css = await get(`https://fonts.googleapis.com/css2?family=${query}&display=swap`, true)
     const faces = parseLatinFaces(css)
 
+    // Without this, a CSS format change upstream makes the script write
+    // NOTHING and exit 0 -- the whole run reports success, src/fonts/ keeps
+    // whatever it had, and the next person to add a family finds no file and
+    // no error. An empty result is the one outcome that must never look like
+    // a completed download.
+    if (faces.length === 0) {
+      throw new Error(
+        `No latin @font-face blocks found for ${family}. The css2 response format ` +
+          `may have changed; inspect it before trusting this script again.`
+      )
+    }
+
     // A variable font answers every requested weight with ONE file, so the
     // distinct urls -- not the weight count -- decide how many files to write.
     const distinct = [...new Set(faces.map((face) => face.url))]
