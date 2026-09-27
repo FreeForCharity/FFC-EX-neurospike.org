@@ -87,9 +87,12 @@ describe('Policy page rendering', () => {
   // now fail, where before only the first occurrence was ever examined.
   it('Donation Policy renders every contact email as a mailto link', () => {
     render(<DonationPolicyPage />)
+    // No `expect(emails.length).toBeGreaterThan(0)`: getAllByText THROWS on
+    // zero matches, so that assertion could never fail and never added
+    // signal -- it only made the loop below look guarded. Raised by Copilot
+    // on #40.
     const emails = screen.getAllByText(siteConfig.contactEmail)
 
-    expect(emails.length).toBeGreaterThan(0)
     for (const email of emails) {
       expect(email.closest('a')).toHaveAttribute('href', `mailto:${siteConfig.contactEmail}`)
     }

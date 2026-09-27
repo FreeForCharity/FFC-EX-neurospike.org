@@ -155,13 +155,26 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     path.join(ROOT, 'src', 'lib', 'site.config.ts')
   )
 
-  // Optional on purpose: a missing mark falls back to the accent rule rather
-  // than failing the build. `pnpm run icons` reads the same file.
+  // ONLY a missing file falls back to the accent rule. A bare `catch {}` here
+  // reported "No public/Images/..." for a permissions error, a directory in
+  // the file's place, or an unreadable disk -- every real problem rendered as
+  // the one benign explanation, and the card would quietly ship without the
+  // mark while the message told you the file was absent. Raised by Copilot
+  // on #41.
+  //
+  // The PNG check is the same one the icon generator makes: the data URI
+  // declares image/png, so a JPEG here is a lie satori discovers at render
+  // time rather than an error naming the file.
+  const logoPath = path.join(ROOT, 'public', 'Images', 'neurospike-logo.png')
   let logoDataUri = null
   try {
-    const logo = await readFile(path.join(ROOT, 'public', 'Images', 'neurospike-logo.png'))
+    const logo = await readFile(logoPath)
+    if (!isPng(logo)) {
+      throw new Error(`${path.relative(ROOT, logoPath)} is not a PNG`)
+    }
     logoDataUri = `data:image/png;base64,${logo.toString('base64')}`
-  } catch {
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
     console.warn('No public/Images/neurospike-logo.png -- card falls back to the accent rule.')
   }
 

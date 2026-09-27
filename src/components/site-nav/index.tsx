@@ -37,6 +37,15 @@ const NAV_BG = '#a3201c'
  * `external: true` renders a raw <a target="_blank" rel="noopener noreferrer">
  * instead of a next/link. It is deliberately kept with no entry using it yet.
  *
+ * ONLY EVER USE IT WITH AN ABSOLUTE URL (https://...). A raw <a> is not
+ * processed by Next, so a same-origin href like '/foo' bypasses `basePath`
+ * and 404s on a project-path GitHub Pages deploy -- the same class of bug
+ * described above, reached from the opposite direction: there, sitePath()
+ * applied the prefix twice; here, nothing applies it at all. Both are
+ * invisible in a local build, where the prefix is empty. A same-origin
+ * destination belongs in the non-external branch, which is what next/link is
+ * for. Raised by Copilot on #40.
+ *
  * It arrived in #39 carrying a "The Latest From NeuroSpike" item pointed at
  * https://sites.google.com/view/neurospike/ -- the Google Site this repo was
  * migrated OFF. That target was removed rather than shipped: the migration's
@@ -92,27 +101,31 @@ export default function SiteNav() {
           />
           {siteConfig.name}
         </Link>
-        {links.map((l) =>
-          l.external ? (
+        {links.map((l) => {
+          // One string for both branches. It was duplicated, and the two
+          // copies would have drifted the first time anyone restyled the nav
+          // while no entry used the external branch -- which is every day so
+          // far, since the branch is deliberately unused. Raised by Copilot
+          // on #40.
+          const linkClass =
+            'text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap'
+
+          return l.external ? (
             <a
               key={l.href}
               href={l.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
+              className={linkClass}
             >
               {l.label}
             </a>
           ) : (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
-            >
+            <Link key={l.href} href={l.href} className={linkClass}>
               {l.label}
             </Link>
           )
-        )}
+        })}
       </div>
     </nav>
   )

@@ -97,14 +97,20 @@ const openResponses = new Set()
 
 /**
  * Cancels the body of every response nobody read.
- *
- * Deliberately per-response and swallowing errors: a body that was already
- * consumed, or a socket the peer has closed, must not turn a passing run
- * into a crash during cleanup.
  */
 async function releaseBody(res) {
-  if (res && res.body && !res.bodyUsed) {
-    await res.body.cancel().catch(() => {})
+  if (!res || !res.body || res.bodyUsed) return
+
+  // try/catch, not `.catch()`. `.catch()` only handles a REJECTED promise --
+  // if `cancel()` throws synchronously (a locked or detached stream), the
+  // throw escapes before there is a promise to attach to, and cleanup after
+  // a passing run crashes the process. The comment said "swallowing errors"
+  // while handling one of the two ways they arrive. Raised by Copilot on #46.
+  try {
+    await res.body.cancel()
+  } catch {
+    // Best effort by design: a body already consumed, or a socket the peer
+    // has closed, must never turn a passing run red during cleanup.
   }
 }
 

@@ -101,6 +101,28 @@ describe('buildIco', () => {
     expect(ico.readUInt8(7)).toBe(0)
   })
 
+  // THE CASE THE OLD CODE GOT BACKWARDS. It wrote `size % 256` under a
+  // comment claiming the modulo prevented a corrupt entry.
+  // `Buffer.writeUInt8` already throws above 255 -- the modulo REMOVED that
+  // protection, and 512 would have been silently written as 0, which an ICO
+  // reader reads as 256. The comment was defending the line that caused the
+  // corruption it warned about.
+  //
+  // The message is asserted, not just the throw: a RangeError from Buffer
+  // satisfies `toThrow()` too while saying nothing about which size was wrong.
+  //
+  // Note what is NOT covered, because it cannot be: with the range check in
+  // place, putting `size % 256` back is an EQUIVALENT mutant. 256 % 256 is 0,
+  // so the two spellings agree across the whole valid domain, and anything
+  // outside it is rejected before the encoding line runs. Measured -- that
+  // mutation leaves every test green. The range check is the fix; the
+  // ternary is only what makes the 256 case readable.
+  it.each([512, 0, -1, 1.5])('refuses %p rather than truncating it to a byte', (size) => {
+    expect(() =>
+      evaluate(`m.buildIco([{size:${JSON.stringify(size)},bytes:Buffer.alloc(4,9)}])`)
+    ).toThrow(/not a valid icon size/)
+  })
+
   it('refuses to write an empty icon', () => {
     expect(() => evaluate('m.buildIco([])')).toThrow()
   })
