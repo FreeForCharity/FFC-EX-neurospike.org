@@ -144,8 +144,25 @@ jobs:
 
   notify-failure:
     name: Notify on production deploy failure
-    needs: [deploy]
-    if: ${{ always() && needs.deploy.result == 'failure' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main') && (github.event_name == 'workflow_run' || github.ref == 'refs/heads/main') }}
+    # `build` is in `needs` as well as `deploy`, and the condition accepts a
+    # failure in EITHER, because a failure in `build` used to be silent.
+    #
+    # When `build` fails, `deploy` does not fail -- it is SKIPPED, so its
+    # result is 'skipped' and a condition testing only `needs.deploy.result ==
+    # 'failure'` is false. That is the more likely of the two failures (it is
+    # where the install, the typecheck and `next build` run; `deploy` is
+    # essentially `actions/deploy-pages`), and it was the one nobody was told
+    # about.
+    #
+    # Observed on 2026-09-27, run 36345293189 on `main`: the production build
+    # failed, `deploy` was skipped, this job was skipped, and no issue was
+    # opened. The live site silently stayed on the previous commit. It was
+    # found by hand only because someone happened to be reading the run list
+    # minutes later; with nobody watching, the site would have sat stale
+    # indefinitely with a green tick on the commit, because CI -- which runs
+    # its own `next build` and passed on that exact SHA -- reports separately.
+    needs: [build, deploy]
+    if: ${{ always() && (needs.build.result == 'failure' || needs.deploy.result == 'failure') && (github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main') && (github.event_name == 'workflow_run' || github.ref == 'refs/heads/main') }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -193,8 +210,20 @@ jobs:
               core.warning(`Could not list/create labels: ${e && e.message ? e.message : e}`);
             }
 
+            // Which stage failed, so the issue points at the right logs.
+            // `deploy` reads 'skipped' when `build` failed, which is exactly
+            // the case this job used to miss entirely.
+            const buildResult = "${{ needs.build.result }}";
+            const deployResult = "${{ needs.deploy.result }}";
+            const failedStage = buildResult === "failure"
+              ? "build (Build for GitHub Pages)"
+              : "deploy (Deploy to GitHub Pages)";
+
             const title = `Production deployment failed (${branch})`;
             const bodyLines = [
+              `Failed stage: **${failedStage}**`,
+              `build: ${buildResult} · deploy: ${deployResult}`,
+              "",
               `Deploy run: ${deployRunUrl}`,
             ];
             if (upstreamRunUrl) {
