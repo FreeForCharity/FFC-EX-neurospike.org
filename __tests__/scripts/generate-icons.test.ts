@@ -110,6 +110,13 @@ describe('buildIco', () => {
   //
   // The message is asserted, not just the throw: a RangeError from Buffer
   // satisfies `toThrow()` too while saying nothing about which size was wrong.
+  //
+  // Note what is NOT covered, because it cannot be: with the range check in
+  // place, putting `size % 256` back is an EQUIVALENT mutant. 256 % 256 is 0,
+  // so the two spellings agree across the whole valid domain, and anything
+  // outside it is rejected before the encoding line runs. Measured -- that
+  // mutation leaves every test green. The range check is the fix; the
+  // ternary is only what makes the 256 case readable.
   it.each([512, 0, -1, 1.5])('refuses %p rather than truncating it to a byte', (size) => {
     expect(() =>
       evaluate(`m.buildIco([{size:${JSON.stringify(size)},bytes:Buffer.alloc(4,9)}])`)
