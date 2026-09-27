@@ -102,11 +102,17 @@ export function parseLatinFaces(css) {
       // The exact condition Turbopack asserts. If Google ever answers this
       // script with the legacy shape, fail loudly here rather than committing
       // a file chosen from an ambiguous list.
+      //
+      // The two messages are deliberately distinct. A legacy block is BOTH
+      // multi-src and non-woff2, so a caller -- or a test -- that only knows
+      // "it threw" cannot tell which guard fired, and removing either one
+      // looks identical from the outside. That is the same failure as
+      // asserting on an exit code without reading the output.
       if (sources.length !== 1) {
-        throw new Error(`Expected exactly one src per face, got ${sources.length}`)
+        throw new Error(`multi-src face: expected exactly one src, got ${sources.length}`)
       }
       if (sources[0][2] !== 'woff2') {
-        throw new Error(`Expected woff2, got ${sources[0][2]}`)
+        throw new Error(`unexpected format: expected woff2, got ${sources[0][2]}`)
       }
 
       return { weight: weight ? Number(weight[1]) : null, url: sources[0][1] }

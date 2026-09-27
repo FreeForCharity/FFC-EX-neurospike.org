@@ -72,6 +72,13 @@ describe('parseLatinFaces', () => {
   // rejects exactly that with "next/font/google queries have exactly one
   // entry". If it ever answers this script that way, it must fail at the
   // download rather than pick one url from an ambiguous list.
+  //
+  // The assertions name WHICH guard fired. A real legacy block is both
+  // multi-src and non-woff2, so `toThrow()` alone passes whichever of the two
+  // checks survives — deleting the count check changed no test result until
+  // these messages were made distinct and asserted on. Mutation testing found
+  // that; it is the same trap as asserting on an exit code without reading
+  // the output.
   it('refuses a legacy multi-src face instead of guessing', () => {
     const legacy = `/* latin */
 @font-face {
@@ -81,11 +88,27 @@ describe('parseLatinFaces', () => {
   unicode-range: U+0000-00FF;
 }`
 
-    expect(() => parse(legacy)).toThrow()
+    expect(() => parse(legacy)).toThrow(/multi-src face/)
+  })
+
+  // All-woff2 and still multi-src: ONLY the count check can reject this, so
+  // it isolates that guard from the format guard.
+  it('refuses two woff2 sources on one face', () => {
+    const twoSources = `/* latin */
+@font-face {
+  font-family: 'Example';
+  font-weight: 400;
+  src: url(https://example.invalid/a.woff2) format('woff2'), url(https://example.invalid/b.woff2) format('woff2');
+  unicode-range: U+0000-00FF;
+}`
+
+    expect(() => parse(twoSources)).toThrow(/multi-src face/)
   })
 
   it('refuses a face that is not woff2', () => {
-    expect(() => parse(face(400, 'https://example.invalid/a.ttf', 'truetype'))).toThrow()
+    expect(() => parse(face(400, 'https://example.invalid/a.ttf', 'truetype'))).toThrow(
+      /unexpected format/
+    )
   })
 
   // An empty result is the one outcome that must never look like a completed
