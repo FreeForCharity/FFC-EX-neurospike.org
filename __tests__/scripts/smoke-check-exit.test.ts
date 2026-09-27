@@ -125,9 +125,56 @@ const ROUTES: Record<string, { type: string; body: string }> = {
   '/icon.png': { type: 'image/png', body: 'x'.repeat(2_436) },
 }
 
+/**
+ * Paths that answer 5xx a set number of times before succeeding, so the
+ * retry branch of fetchWithRetry can be exercised. Reset per test.
+ */
+const failuresRemaining = new Map<string, number>()
+
+/**
+ * Serves a home page that is 200 but satisfies none of the content
+ * assertions, so the run fails FAST.
+ *
+ * A wrong body is the right way to force a failure here. The obvious
+ * alternative -- pointing the script at an unroutable port -- makes every
+ * fetch throw, and the script then retries each one until its 180s deadline:
+ * the first draft of this test took 66 seconds and was killed by the
+ * harness rather than exiting. A 200 with the wrong content is recorded as
+ * a failure immediately and never retried.
+ */
+let serveBrokenHome = false
+
 function startKeepAliveServer(): Promise<Server> {
   const server = createServer((req, res) => {
     const path = (req.url ?? '/').split('?')[0]
+
+    // The retry branch discards a response WITHOUT anyone reading it, so the
+    // error body here is deliberately large: a few bytes are buffered and
+    // hold nothing, while a body that does not fit pins a socket for the
+    // whole retry loop. That loop runs precisely when a deploy is least
+    // healthy, which is the worst possible time to hang.
+    const remaining = failuresRemaining.get(path) ?? 0
+    if (remaining > 0) {
+      failuresRemaining.set(path, remaining - 1)
+      res.writeHead(503, {
+        'Content-Type': 'text/html',
+        Connection: 'keep-alive',
+        'Keep-Alive': 'timeout=120',
+      })
+      res.end('x'.repeat(200_000))
+      return
+    }
+
+    if (serveBrokenHome && path === '/') {
+      res.writeHead(200, {
+        'Content-Type': 'text/html',
+        Connection: 'keep-alive',
+        'Keep-Alive': 'timeout=120',
+      })
+      res.end('<!doctype html><html><body>nothing this script looks for</body></html>')
+      return
+    }
+
     const route = ROUTES[path]
 
     // Anything unlisted is a real 404 — which is what the script's
@@ -161,20 +208,38 @@ type Outcome = {
   signal: NodeJS.Signals | null
   timedOut: boolean
   elapsedMs: number
+  stdout: string
+  stderr: string
 }
 
 function runSmokeCheck(baseUrl: string): Promise<Outcome> {
   return new Promise((resolve) => {
     const started = Date.now()
-    const child = spawn('node', [SCRIPT, baseUrl], { stdio: 'ignore' })
+    // Piped, not ignored: a pipe is what a CI runner gives this process, and
+    // it is the reason exiting without flushing truncates output. Reading
+    // them here also lets the stderr test below assert on the failure
+    // summary.
+    const child = spawn('node', [SCRIPT, baseUrl], { stdio: ['ignore', 'pipe', 'pipe'] })
+    let stdout = ''
+    let stderr = ''
+    child.stdout.on('data', (chunk) => (stdout += chunk))
+    child.stderr.on('data', (chunk) => (stderr += chunk))
+
     const timer = setTimeout(() => {
       child.kill('SIGKILL')
-      resolve({ code: null, signal: 'SIGKILL', timedOut: true, elapsedMs: Date.now() - started })
+      resolve({
+        code: null,
+        signal: 'SIGKILL',
+        timedOut: true,
+        elapsedMs: Date.now() - started,
+        stdout,
+        stderr,
+      })
     }, EXIT_BUDGET_MS)
 
-    child.on('exit', (code, signal) => {
+    child.on('close', (code, signal) => {
       clearTimeout(timer)
-      resolve({ code, signal, timedOut: false, elapsedMs: Date.now() - started })
+      resolve({ code, signal, timedOut: false, elapsedMs: Date.now() - started, stdout, stderr })
     })
   })
 }
@@ -223,6 +288,60 @@ describe('smoke-check process exit', () => {
       // "it terminated" would therefore pass on the broken code, which is
       // exactly what an earlier draft of this test did.
       expect(outcome.elapsedMs).toBeLessThan(3_000)
+    },
+    EXIT_BUDGET_MS + 15_000
+  )
+
+  // Retrying must not add time beyond the delay it asks for. The script
+  // waits RETRY_DELAY_MS (5s) between attempts, so one forced 503 puts the
+  // floor at ~5s; measured, the whole run takes ~5.17s.
+  //
+  // WHAT THIS DOES *NOT* PROVE. The retry branch also releases the body of
+  // the response it discards, and this test cannot see that: measured over
+  // two runs each, with the release 5169/5177ms and without it 5192/5167ms —
+  // no difference. A later request on the same connection pool appears to
+  // clean the abandoned socket up, so only the bodies left unread at the
+  // very END of the run (the icons, the favicon) ever held the process open.
+  // The release on the retry path is defence in depth against a case this
+  // fixture does not produce, not a measured fix, and it is described that
+  // way rather than counted as covered.
+  it(
+    'does not add time beyond the retry delay it asks for',
+    async () => {
+      failuresRemaining.set('/android-chrome-512x512.png', 1)
+
+      const outcome = await runSmokeCheck(baseUrl)
+
+      expect(outcome.timedOut).toBe(false)
+      expect(outcome.code).toBe(0)
+      expect(outcome.elapsedMs).toBeLessThan(8_000)
+    },
+    EXIT_BUDGET_MS + 15_000
+  )
+
+  // The per-check lines go to stdout; `Failures:` and the crash stack go to
+  // stderr, and exiting after flushing only stdout can truncate the one
+  // thing a red run is read for.
+  //
+  // WHAT THIS DOES *NOT* PROVE, again stated rather than implied: waiting
+  // for stderr specifically. This failure summary is ~1KB, comfortably
+  // inside a pipe's buffer, so it survives either way — flushing stdout only
+  // passes this test too. It is asserted because the summary reaching stderr
+  // AT ALL is worth pinning, and the two-stream wait is correctness that
+  // shows up at output sizes this fixture does not reach.
+  it(
+    'writes the failure summary to stderr and exits non-zero',
+    async () => {
+      serveBrokenHome = true
+      const outcome = await runSmokeCheck(baseUrl).finally(() => {
+        serveBrokenHome = false
+      })
+
+      expect(outcome.timedOut).toBe(false)
+      expect(outcome.code).toBe(1)
+      expect(outcome.stderr).toContain('Failures:')
+      // Not merely the heading: the list under it has to survive too.
+      expect(outcome.stderr).toMatch(/\n {2}- /)
     },
     EXIT_BUDGET_MS + 15_000
   )

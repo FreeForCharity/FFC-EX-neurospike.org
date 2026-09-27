@@ -102,26 +102,39 @@ const openResponses = new Set()
  * consumed, or a socket the peer has closed, must not turn a passing run
  * into a crash during cleanup.
  */
+async function releaseBody(res) {
+  if (res && res.body && !res.bodyUsed) {
+    await res.body.cancel().catch(() => {})
+  }
+}
+
 async function releaseUnreadBodies() {
   for (const res of openResponses) {
-    if (res.body && !res.bodyUsed) {
-      await res.body.cancel().catch(() => {})
-    }
+    await releaseBody(res)
   }
   openResponses.clear()
 }
 
 /**
- * Exits once stdout has actually flushed.
+ * Exits once BOTH streams have actually flushed.
  *
- * `console.log` to a PIPE -- which is what a CI runner gives this process --
- * is asynchronous, so a bare `process.exit()` can truncate the summary that
- * says why the run failed. Writing an empty string and exiting from its
- * callback waits for the queue to drain first.
+ * Writing to a PIPE -- which is what a CI runner gives this process -- is
+ * asynchronous, so a bare `process.exit()` can truncate output. Both streams
+ * matter and stdout alone is the wrong half to wait for: the per-check lines
+ * go to stdout, but the `Failures:` summary and the crash stack go to
+ * STDERR, and those are the ones someone reads when a run goes red.
  */
 function exitWhenFlushed(code) {
   process.exitCode = code
-  process.stdout.write('', () => process.exit(code))
+
+  let pending = 2
+  const done = () => {
+    pending -= 1
+    if (pending === 0) process.exit(code)
+  }
+
+  process.stdout.write('', done)
+  process.stderr.write('', done)
 }
 
 async function fetchWithRetry(path, options = {}) {
@@ -142,6 +155,13 @@ async function fetchWithRetry(path, options = {}) {
       // Callers can disable 404 retry for expected fallback probes.
       if (res.status >= 500 || res.status === 429 || (retry404 && res.status === 404)) {
         lastErr = `HTTP ${res.status}`
+        // Released here rather than added to openResponses: this response is
+        // being thrown away, and nobody will ever read it. A 5xx or a
+        // Pages-propagation 404 still carries an HTML error body, so leaving
+        // it unread holds a socket for the whole retry loop -- the same hang
+        // this function was changed to prevent, on the path that by
+        // definition runs when the deploy is at its least healthy.
+        await releaseBody(res)
         await sleep(RETRY_DELAY_MS)
         continue
       }
