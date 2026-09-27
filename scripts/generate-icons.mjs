@@ -47,6 +47,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import React from 'react'
 import { ImageResponse } from 'next/og.js'
+import { isPng } from './png-signature.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PUBLIC_DIR = path.join(ROOT, 'public')
@@ -143,7 +144,7 @@ async function renderPng(dataUri, size, background) {
 
   // ImageResponse returning something that is not a PNG would otherwise be
   // written straight to public/ and only surface in a browser, months later.
-  if (bytes.subarray(1, 4).toString('latin1') !== 'PNG') {
+  if (!isPng(bytes)) {
     throw new Error(`ImageResponse did not return a PNG for ${size}x${size}`)
   }
 
