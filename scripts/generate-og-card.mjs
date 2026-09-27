@@ -30,11 +30,12 @@
  * The font is ImageResponse's bundled sans face -- deliberately no font file
  * and no network fetch, so this runs in CI and offline.
  */
-import { writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import React from 'react'
 import { ImageResponse } from 'next/og.js'
+import { isPng } from './png-signature.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const OUTPUT = path.join(ROOT, 'public', 'og-card.png')
@@ -81,7 +82,12 @@ export function cardPalette(backgroundHex) {
 
 const el = React.createElement
 
-export function cardElement(siteConfig, description) {
+/**
+ * `logoDataUri` is optional and defaults to the rule described below, so the
+ * template's no-wordmark case keeps working unchanged -- a fork that deletes
+ * public/Images/neurospike-logo.png gets a card, not a crash.
+ */
+export function cardElement(siteConfig, description, logoDataUri = null) {
   const palette = cardPalette(siteConfig.themeColor)
 
   return el(
@@ -98,12 +104,17 @@ export function cardElement(siteConfig, description) {
         color: palette.title,
       },
     },
-    // A rule rather than a logo: the template ships no wordmark, and blowing
-    // the 512px app icon up to card size is the artefact this card replaces.
-    // A fork with a wordmark can swap this one element for an <img>.
-    el('div', {
-      style: { display: 'flex', width: 120, height: 10, backgroundColor: palette.accent },
-    }),
+    // The template ships no wordmark, so this was a plain accent rule, with a
+    // note that a fork carrying one could swap it for an <img>. NeuroSpike now
+    // has one -- @goldspruce's badge, contributed in #39 -- so this is that
+    // swap. The rule stays as the fallback for a fork without a mark; what is
+    // NOT acceptable here is the 512px app icon blown up to card size, which
+    // is the artefact issue #23 filed this card to replace.
+    logoDataUri
+      ? el('img', { src: logoDataUri, width: 132, height: 132 })
+      : el('div', {
+          style: { display: 'flex', width: 120, height: 10, backgroundColor: palette.accent },
+        }),
     el(
       'div',
       { style: { display: 'flex', flexDirection: 'column' } },
@@ -144,13 +155,28 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     path.join(ROOT, 'src', 'lib', 'site.config.ts')
   )
 
-  const response = new ImageResponse(cardElement(siteConfig, cardDescription()), {
+  // Optional on purpose: a missing mark falls back to the accent rule rather
+  // than failing the build. `pnpm run icons` reads the same file.
+  let logoDataUri = null
+  try {
+    const logo = await readFile(path.join(ROOT, 'public', 'Images', 'neurospike-logo.png'))
+    logoDataUri = `data:image/png;base64,${logo.toString('base64')}`
+  } catch {
+    console.warn('No public/Images/neurospike-logo.png -- card falls back to the accent rule.')
+  }
+
+  const response = new ImageResponse(cardElement(siteConfig, cardDescription(), logoDataUri), {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
   })
   const bytes = Buffer.from(await response.arrayBuffer())
 
-  if (bytes.subarray(1, 4).toString('latin1') !== 'PNG') {
+  // The full 8-byte signature, not the `PNG` inside it: three ASCII letters
+  // occur by accident in plenty of binary data, and this guard exists to stop
+  // a non-PNG being written into public/ where it would next be noticed in a
+  // browser. isPng() is shared with the icon generator, which makes the same
+  // check on the same kind of output.
+  if (!isPng(bytes)) {
     throw new Error('ImageResponse did not return a PNG')
   }
 
