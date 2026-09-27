@@ -40,8 +40,8 @@ const NAV_BG = '#a3201c'
  * ONLY EVER USE IT WITH AN ABSOLUTE URL (https://...). A raw <a> is not
  * processed by Next, so a same-origin href like '/foo' bypasses `basePath`
  * and 404s on a project-path GitHub Pages deploy -- the same class of bug
- * described above, reached from the opposite direction: there sitePath()
- * applied the prefix twice, here nothing applies it at all. Both are
+ * described above, reached from the opposite direction: there, sitePath()
+ * applied the prefix twice; here, nothing applies it at all. Both are
  * invisible in a local build, where the prefix is empty. A same-origin
  * destination belongs in the non-external branch, which is what next/link is
  * for. Raised by Copilot on #40.
