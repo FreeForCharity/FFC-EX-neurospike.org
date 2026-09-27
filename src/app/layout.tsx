@@ -4,16 +4,7 @@ import SiteNav from '@/components/site-nav'
 import CookieConsent from './../components/cookie-consent'
 import GoogleTagManager, { GoogleTagManagerNoScript } from './../components/google-tag-manager'
 import { siteConfig } from '@/lib/site.config'
-import {
-  openSans,
-  lato,
-  raleway,
-  faustina,
-  cantataOne,
-  faunaOne,
-  montserrat,
-  cinzel,
-} from '@/lib/fonts'
+import { openSans, lato, faustina, faunaOne } from '@/lib/fonts'
 import { siteMetadata } from '@/lib/siteMetadata'
 import { assetPath } from '@/lib/assetPath'
 import { organizationSchema } from '@/lib/organizationSchema'
@@ -96,12 +87,8 @@ export default function RootLayout({
           'antialiased',
           openSans.variable,
           lato.variable,
-          raleway.variable,
           faustina.variable,
-          cantataOne.variable,
           faunaOne.variable,
-          montserrat.variable,
-          cinzel.variable,
         ].join(' ')}
         suppressHydrationWarning={true}
       >
