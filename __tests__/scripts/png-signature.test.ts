@@ -72,9 +72,12 @@ describe('isPng', () => {
     expect(isPng([0x89, 0x50, 0x4e, 0x47, 0x0a, 0x1a, 0x0a])).toBe(false)
   })
 
-  // Buffer.subarray CLAMPS rather than throwing, so without the length guard
-  // a short buffer is compared as a short subarray -- false for the right
-  // reason by accident. Asserted so the guard cannot be removed silently.
+  // Behaviour, not implementation. isPng carries no explicit length check:
+  // Buffer.subarray clamps rather than throwing, so a short buffer is
+  // compared as a short subarray and `equals` is false because the lengths
+  // differ. An explicit `bytes.length >= 8 &&` was written first and removed
+  // when mutation testing showed deleting it changed nothing. These cases
+  // stay because callers depend on the outcome regardless of how it arises.
   it('rejects a buffer too short to hold a signature', () => {
     expect(isPng([])).toBe(false)
     expect(isPng(VALID.slice(0, 7))).toBe(false)

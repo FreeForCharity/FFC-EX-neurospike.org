@@ -25,12 +25,20 @@ export const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x
  * endings, or truncates at a DOS end-of-file, corrupts the signature instead
  * of silently corrupting the image data.
  *
- * The length guard matters too -- `Buffer.subarray` clamps rather than
- * throwing, so a 3-byte buffer would otherwise be compared as a 3-byte
- * subarray and `equals` would simply return false for the right reason by
- * accident. Being explicit means a caller can distinguish "not a PNG" from
- * "not a buffer at all".
+ * A SHORT BUFFER IS HANDLED, AND NOT BY AN EXPLICIT LENGTH CHECK. This first
+ * read `bytes.length >= 8 && bytes.subarray(0, 8).equals(...)`, which looks
+ * like the careful version and is dead code: `Buffer.subarray` clamps rather
+ * than throwing, so a 3-byte buffer is compared as a 3-byte subarray and
+ * `equals` is false because the lengths differ. Mutation testing caught it --
+ * deleting the length guard changed no test result, which is the definition
+ * of a check that cannot fail. It is gone rather than kept for reassurance,
+ * because a condition that can never be false reads as protection while
+ * providing none. The short-buffer cases stay in the test: they pin the
+ * BEHAVIOUR, which is what callers depend on, however it is delivered.
+ *
+ * `Buffer.isBuffer` is not redundant in the same way -- a plain Uint8Array
+ * has no `.equals`, so without it this throws rather than returning false.
  */
 export function isPng(bytes) {
-  return Buffer.isBuffer(bytes) && bytes.length >= 8 && bytes.subarray(0, 8).equals(PNG_SIGNATURE)
+  return Buffer.isBuffer(bytes) && bytes.subarray(0, 8).equals(PNG_SIGNATURE)
 }
