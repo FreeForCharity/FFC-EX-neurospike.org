@@ -46,8 +46,21 @@ export default function DonationPolicy() {
             How to Donate
           </h2>
           <p>
-            We do not currently process donations online. To make a tax-deductible contribution,
-            discuss grant funding, or arrange giving by check or bank wire, please contact us
+            You can make a tax-deductible donation online through our secure giving page on Zeffy (0%
+            platform fees — 100% of your donation goes to {siteConfig.name}):
+          </p>
+          <p>
+            <a
+              href="https://www.zeffy.com/en-US/donation-form/neurospike-generated-new-paradigms-for-neuroscience-and-medicine"
+              className="text-primary underline font-semibold"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Donate via Zeffy
+            </a>
+          </p>
+          <p>
+            To discuss grant funding, or arrange giving by check or bank wire, please contact us
             directly at{' '}
             <a href={`mailto:${siteConfig.contactEmail}`} className="text-primary underline">
               {siteConfig.contactEmail}

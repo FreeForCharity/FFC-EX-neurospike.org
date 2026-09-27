@@ -31,12 +31,17 @@ import { siteConfig } from '@/lib/site.config'
 
 const NAV_BG = '#a3201c'
 
-const links = [
+const links: { label: string; href: string; external?: boolean }[] = [
   { label: 'Neurospike', href: '/' },
   { label: 'Org & Leadership', href: '/org-leadership' },
   { label: 'Other Research: CNAGI', href: '/other-research-cnagi' },
   { label: 'Media & About', href: '/media-about' },
   { label: 'Substacky', href: '/substacky' },
+  {
+    label: 'The Latest From NeuroSpike',
+    href: 'https://sites.google.com/view/neurospike/',
+    external: true,
+  },
 ]
 
 export default function SiteNav() {
@@ -53,15 +58,27 @@ export default function SiteNav() {
         >
           {siteConfig.name}
         </Link>
-        {links.map((l) => (
-          <Link
-            key={l.href}
-            href={l.href}
-            className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
-          >
-            {l.label}
-          </Link>
-        ))}
+        {links.map((l) =>
+          l.external ? (
+            <a
+              key={l.href}
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
+            >
+              {l.label}
+            </a>
+          ) : (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="text-[13.5px] font-[500] text-white/90 hover:text-white no-underline whitespace-nowrap"
+            >
+              {l.label}
+            </Link>
+          )
+        )}
       </div>
     </nav>
   )
