@@ -46,8 +46,8 @@ export default function DonationPolicy() {
             How to Donate
           </h2>
           <p>
-            You can make a tax-deductible donation online through our secure giving page on Zeffy (0%
-            platform fees — 100% of your donation goes to {siteConfig.name}):
+            You can make a tax-deductible donation online through our secure giving page on Zeffy
+            (0% platform fees — 100% of your donation goes to {siteConfig.name}):
           </p>
           <p>
             <a

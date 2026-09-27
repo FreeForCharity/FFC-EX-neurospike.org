@@ -31,17 +31,28 @@ import { siteConfig } from '@/lib/site.config'
 
 const NAV_BG = '#a3201c'
 
+/**
+ * `external: true` renders a raw <a target="_blank" rel="noopener noreferrer">
+ * instead of a next/link. It is deliberately kept with no entry using it yet.
+ *
+ * It arrived in #39 carrying a "The Latest From NeuroSpike" item pointed at
+ * https://sites.google.com/view/neurospike/ -- the Google Site this repo was
+ * migrated OFF. That target was removed rather than shipped: the migration's
+ * measured result was zero sites.google.com and zero googleusercontent
+ * references in the deployed pages, and a nav link is the single most
+ * prominent place to undo that. It would also send visitors from the new site
+ * back to the old one, where content diverges the moment either is edited.
+ *
+ * The MECHANISM is right and is kept for when there is a destination we
+ * control -- a real Substack, say. Wiring one is a single entry here. Do not
+ * re-point it at the Google Site.
+ */
 const links: { label: string; href: string; external?: boolean }[] = [
   { label: 'Neurospike', href: '/' },
   { label: 'Org & Leadership', href: '/org-leadership' },
   { label: 'Other Research: CNAGI', href: '/other-research-cnagi' },
   { label: 'Media & About', href: '/media-about' },
   { label: 'Substacky', href: '/substacky' },
-  {
-    label: 'The Latest From NeuroSpike',
-    href: 'https://sites.google.com/view/neurospike/',
-    external: true,
-  },
 ]
 
 export default function SiteNav() {

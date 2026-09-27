@@ -5,6 +5,7 @@
     "^https://([a-z0-9-]+\\.)?linkedin\\.com/.*",
     "^https://([a-z0-9-]+\\.)?twitter\\.com/.*",
     "^https://([a-z0-9-]+\\.)?facebook\\.com/.*",
+    "^https://([a-z0-9-]+\\.)?nytimes\\.com/.*",
     "^https://forms.monday.com/.*",
     "^https://www\\.zeffy\\.com/privacy/?$",
     "^mailto:.*",
