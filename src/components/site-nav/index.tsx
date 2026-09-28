@@ -54,12 +54,11 @@ const NAV_BG = '#a3201c'
  * prominent place to undo that. It would also send visitors from the new site
  * back to the old one, where content diverges the moment either is edited.
  *
- * THE REQUEST BEHIND IT WAS RIGHT, AND IS NOW SERVED. @goldspruce asked twice
- * for "a prominent link ... that says something like 'The Latest From
- * NeuroSpike'". Removing his entry answered the destination objection and
- * left the need unmet for a fortnight. `/updates` is that destination, on a
- * site we control, so the nav item below is a plain internal link and needs
- * no `external` treatment at all.
+ * THE NEED BEHIND IT IS SERVED BY `/updates`. A prominent "The Latest From
+ * NeuroSpike" entry is what was asked for; removing the Google Site target
+ * answered only where it pointed. `/updates` is that destination on a site we
+ * control, so the nav item below is a plain internal link and needs no
+ * `external` treatment at all.
  *
  * The MECHANISM is still kept, still unused, for a genuine off-site
  * destination later -- a real Substack, say. Do not re-point it at the

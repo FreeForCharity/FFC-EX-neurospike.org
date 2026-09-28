@@ -80,8 +80,21 @@ export default function Updates() {
         years.map(([year, entries]) => (
           <section key={year}>
             <H2 id={`y${year}`}>{year}</H2>
-            {entries.map((entry) => (
-              <article key={`${entry.date}-${entry.title}`} className="mb-[26px]">
+            {/*
+              The index is IN THE KEY, not decoration. `date`-`title` alone is
+              not unique: two posts can share a date, and __tests__/data
+              deliberately permits a repeated headline (an annual "Grant
+              renewed", say). Measured with two entries sharing both fields,
+              React logs "Encountered two children with the same key" and
+              says the resulting reconciliation is unsupported -- children
+              may be duplicated or omitted. Raised by Copilot on #50.
+
+              Index alone would be worse: it re-keys every later entry when a
+              post is inserted. Together they are unique within the list and
+              stable for everything above the insertion point.
+            */}
+            {entries.map((entry, i) => (
+              <article key={`${entry.date}-${entry.title}-${i}`} className="mb-[26px]">
                 <H3>{entry.title}</H3>
                 {/*
                   <time dateTime> gives the machine-readable form while the

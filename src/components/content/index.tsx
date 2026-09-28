@@ -71,15 +71,7 @@ export function OL({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * External link from lifted content.
- *
- * New-tab behaviour applies to http(s) destinations only. `mailto:` and `tel:`
- * hand off to a mail client or dialler rather than navigating, so opening a tab
- * for them leaves a blank window behind; `rel="noopener"` is likewise
- * meaningless for a non-browsing scheme.
- */
-/**
- * A link in page content.
+ * A link in page content. Three destinations, three behaviours.
  *
  * AN INTERNAL ROUTE IS RENDERED WITH next/link, NOT A RAW <a>. This used to
  * be a raw <a> for every href, which is wrong for a same-origin route on a
@@ -100,6 +92,11 @@ export function OL({ children }: { children: React.ReactNode }) {
  *
  * `//evil.example` is NOT internal: a protocol-relative URL leaves the origin
  * despite starting with a slash.
+ *
+ * EVERYTHING ELSE IS A RAW <a>, and new-tab behaviour applies to http(s) only.
+ * `mailto:` and `tel:` hand off to a mail client or dialler rather than
+ * navigating, so opening a tab for them leaves a blank window behind;
+ * `rel="noopener"` is likewise meaningless for a non-browsing scheme.
  */
 export function A({ href, children }: { href: string; children: React.ReactNode }) {
   const opensInBrowser = /^https?:\/\//i.test(href)
