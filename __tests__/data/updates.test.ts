@@ -91,18 +91,32 @@ describe('updates data', () => {
     expect(isSafeLinkUrl(url as string)).toBe(expected)
   })
 
-  // The array is hand-maintained, which is the price of a static export.
-  // This is what stops a file being added and forgotten.
-  it('imports every JSON file in the folder', () => {
+  /*
+    The array is hand-maintained, which is the price of a static export.
+    This is what stops a file being added and forgotten.
+
+    Compared as a CANONICAL MULTISET, not by title membership. The first
+    version built a Set of titles and asked whether each file's title was in
+    it — which two entries sharing a headline defeat outright. Measured, with
+    `a.json` and `b.json` both titled "Same headline" and the array importing
+    `a.json` twice: lengths matched, every title was "present", the old
+    assertion returned **true**, and `b.json` was missing from the site.
+
+    Sorting both sides and comparing the whole entry closes it: a file that
+    nothing imports has no counterpart, whatever it is called. Raised by
+    Copilot on #50.
+  */
+  it('imports every JSON file in the folder, exactly once', () => {
+    const canon = (entry: Update) => JSON.stringify(Object.entries(entry).sort())
     const onDisk = readdirSync(DIR).filter((f) => f.endsWith('.json'))
-    const titles = new Set(updates.map((e) => e.title))
 
     expect(onDisk.length).toBe(updates.length)
 
-    for (const file of onDisk) {
-      const parsed = JSON.parse(readFileSync(join(DIR, file), 'utf8')) as Update
-      expect(titles.has(parsed.title)).toBe(true)
-    }
+    const fromDisk = onDisk
+      .map((file) => canon(JSON.parse(readFileSync(join(DIR, file), 'utf8')) as Update))
+      .sort()
+
+    expect(updates.map(canon).sort()).toEqual(fromDisk)
   })
 
   it('documents the format for the people who edit it', () => {
