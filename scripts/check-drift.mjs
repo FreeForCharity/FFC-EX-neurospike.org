@@ -280,6 +280,52 @@ async function checkLinkBasePathDoubling() {
   }
 }
 
+/**
+ * The complementary half of checkLinkBasePathDoubling(): a raw <a> carrying an
+ * INTERNAL route path, where nothing applies `basePath` at all.
+ *
+ * Same outcome as the double-prefix bug, reached from the other side. There
+ * `sitePath()` applied the prefix twice and links went to `/repo/repo/...`;
+ * here nothing applies it and they go to the domain root, so
+ * `<a href="/substacky">` lands on `freeforcharity.github.io/substacky` and
+ * 404s. Both are invisible in a local build, where the prefix is empty.
+ *
+ * Caught in review on #50 after a new page shipped four of them. The
+ * components/content `A` helper now routes internal paths through next/link,
+ * so the common case cannot recur — this guards the raw <a> that someone
+ * writes by hand next time.
+ *
+ * NOT FLAGGED: `//host` (protocol-relative, leaves the origin), `#anchor`,
+ * `mailto:`/`tel:`, and an href wrapped in sitePath() or assetPath(), which
+ * is the correct spelling for a file in public/.
+ */
+async function checkRawAnchorBasePath() {
+  const files = await walk(SRC_DIR, (name) => /\.(tsx|jsx)$/.test(name))
+
+  for (const file of files) {
+    const body = await readFile(file, 'utf8')
+    const rel = relative(ROOT, file)
+
+    // A literal, same-origin href on a raw <a ...> tag.
+    // Every JSX spelling of a literal href: "..." '...' {"..."} {'...'}.
+    // The first version omitted {'...'}, which is the most idiomatic of the
+    // four — a real gap in a guard, found in review on #50.
+    const pattern = /<a\s[^>]*?href=\{?\s*(?:"|')(\/(?!\/)[^"'\s]*)/g
+    let match
+    while ((match = pattern.exec(body))) {
+      if (insideComment(body, match.index)) continue
+
+      errors.push(
+        `${rel}:${lineAt(body, match.index)} gives a raw <a> the internal path ` +
+          `"${match[1]}". Nothing applies basePath to a raw anchor, so this 404s on a ` +
+          'GitHub Pages project deploy. Use next/link with the bare path, or the A ' +
+          'helper in components/content, which does that for you. sitePath() is only ' +
+          'for a file in public/ that Next does not route.'
+      )
+    }
+  }
+}
+
 async function checkAssetPathUsage() {
   const files = await walk(SRC_DIR, (name) => /\.(tsx?|jsx?)$/.test(name))
   const literalPattern = /(["'`])(\/(?:Images|Svgs|videos)\/[^"'`\n]+?)\1/g
@@ -790,6 +836,7 @@ checkSiteConfigUrl(siteConfig)
 await checkKebabCaseRoutes()
 await checkAssetPathUsage()
 await checkLinkBasePathDoubling()
+await checkRawAnchorBasePath()
 await checkSecrets()
 await checkDeployOrigin(siteConfig)
 await checkPlaceholderUrl(siteConfig)
