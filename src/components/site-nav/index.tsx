@@ -54,9 +54,16 @@ const NAV_BG = '#a3201c'
  * prominent place to undo that. It would also send visitors from the new site
  * back to the old one, where content diverges the moment either is edited.
  *
- * The MECHANISM is right and is kept for when there is a destination we
- * control -- a real Substack, say. Wiring one is a single entry here. Do not
- * re-point it at the Google Site.
+ * THE REQUEST BEHIND IT WAS RIGHT, AND IS NOW SERVED. @goldspruce asked twice
+ * for "a prominent link ... that says something like 'The Latest From
+ * NeuroSpike'". Removing his entry answered the destination objection and
+ * left the need unmet for a fortnight. `/updates` is that destination, on a
+ * site we control, so the nav item below is a plain internal link and needs
+ * no `external` treatment at all.
+ *
+ * The MECHANISM is still kept, still unused, for a genuine off-site
+ * destination later -- a real Substack, say. Do not re-point it at the
+ * Google Site.
  */
 const links: { label: string; href: string; external?: boolean }[] = [
   { label: 'Neurospike', href: '/' },
@@ -64,6 +71,7 @@ const links: { label: string; href: string; external?: boolean }[] = [
   { label: 'Other Research: CNAGI', href: '/other-research-cnagi' },
   { label: 'Media & About', href: '/media-about' },
   { label: 'Substacky', href: '/substacky' },
+  { label: 'The Latest', href: '/updates' },
 ]
 
 export default function SiteNav() {

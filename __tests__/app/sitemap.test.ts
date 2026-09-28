@@ -9,6 +9,7 @@ import { metadata as mediaAboutMetadata } from '../../src/app/media-about/page'
 import { metadata as orgLeadershipMetadata } from '../../src/app/org-leadership/page'
 import { metadata as otherResearchCnagiMetadata } from '../../src/app/other-research-cnagi/page'
 import { metadata as substackyMetadata } from '../../src/app/substacky/page'
+import { metadata as updatesMetadata } from '../../src/app/updates/page'
 import { metadata as donationPolicyMetadata } from '../../src/app/donation-policy/page'
 import { metadata as ffcDonationPolicyMetadata } from '../../src/app/free-for-charity-donation-policy/page'
 import { metadata as privacyPolicyMetadata } from '../../src/app/privacy-policy/page'
@@ -27,6 +28,7 @@ const metadataByRoute: Record<string, Metadata> = {
   '/other-research-cnagi': otherResearchCnagiMetadata,
   '/media-about': mediaAboutMetadata,
   '/substacky': substackyMetadata,
+  '/updates': updatesMetadata,
   '/privacy-policy': privacyPolicyMetadata,
   '/cookie-policy': cookiePolicyMetadata,
   '/terms-of-service': termsOfServiceMetadata,

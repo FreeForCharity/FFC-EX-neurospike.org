@@ -21,6 +21,7 @@ export const routes: readonly SitemapEntry[] = [
   { path: '/other-research-cnagi', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/media-about', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/substacky', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/updates', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/privacy-policy', changeFrequency: 'yearly', priority: 0.2 },
   { path: '/cookie-policy', changeFrequency: 'yearly', priority: 0.2 },
   { path: '/terms-of-service', changeFrequency: 'yearly', priority: 0.2 },

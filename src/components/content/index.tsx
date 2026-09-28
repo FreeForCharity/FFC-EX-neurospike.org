@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 
 /**
  * Shared prose primitives for the lifted Neurospike content.
@@ -77,15 +78,48 @@ export function OL({ children }: { children: React.ReactNode }) {
  * for them leaves a blank window behind; `rel="noopener"` is likewise
  * meaningless for a non-browsing scheme.
  */
+/**
+ * A link in page content.
+ *
+ * AN INTERNAL ROUTE IS RENDERED WITH next/link, NOT A RAW <a>. This used to
+ * be a raw <a> for every href, which is wrong for a same-origin route on a
+ * GitHub Pages PROJECT deploy: nothing applies `basePath`, so
+ * `<A href="/substacky">` navigates to `freeforcharity.github.io/substacky`
+ * and 404s. Caught in review on #50, where it shipped on a new page and
+ * nowhere else.
+ *
+ * It is fixed HERE rather than at the call sites because the call sites are
+ * not all written by developers: src/data/updates/*.json accepts a `linkUrl`,
+ * documented as "https:// or an internal path starting /", and those values
+ * flow straight into this component. A charity writing `/media-about` in a
+ * JSON file must not be able to produce a broken link.
+ *
+ * The href stays BARE -- next/link applies basePath itself, and wrapping it
+ * in sitePath() applies it twice, which is the opposite bug and is guarded by
+ * checkLinkBasePathDoubling() in scripts/check-drift.mjs.
+ *
+ * `//evil.example` is NOT internal: a protocol-relative URL leaves the origin
+ * despite starting with a slash.
+ */
 export function A({ href, children }: { href: string; children: React.ReactNode }) {
   const opensInBrowser = /^https?:\/\//i.test(href)
+  const isInternalRoute = href.startsWith('/') && !href.startsWith('//')
+  const className = 'text-[#1a4fd6] underline underline-offset-2 hover:text-[#12379b] break-words'
+
+  if (isInternalRoute) {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    )
+  }
 
   return (
     <a
       href={href}
       target={opensInBrowser ? '_blank' : undefined}
       rel={opensInBrowser ? 'noopener noreferrer' : undefined}
-      className="text-[#1a4fd6] underline underline-offset-2 hover:text-[#12379b] break-words"
+      className={className}
     >
       {children}
     </a>
