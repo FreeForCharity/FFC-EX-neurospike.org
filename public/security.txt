@@ -14,7 +14,7 @@
 Contact: mailto:rlee@codex.stanford.edu
 Expires: 2027-12-31T00:00:00.000Z
 Preferred-Languages: en
-Canonical: https://freeforcharity.github.io/FFC-EX-neurospike.org/.well-known/security.txt
-Canonical: https://freeforcharity.github.io/FFC-EX-neurospike.org/security.txt
-Policy: https://freeforcharity.github.io/FFC-EX-neurospike.org/vulnerability-disclosure-policy
-Acknowledgments: https://freeforcharity.github.io/FFC-EX-neurospike.org/security-acknowledgements
+Canonical: https://neurospike.org/.well-known/security.txt
+Canonical: https://neurospike.org/security.txt
+Policy: https://neurospike.org/vulnerability-disclosure-policy
+Acknowledgments: https://neurospike.org/security-acknowledgements
