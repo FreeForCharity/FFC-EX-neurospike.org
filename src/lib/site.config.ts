@@ -123,21 +123,20 @@ export const siteConfig: SiteConfig = {
   //
   // It therefore does NOT stay correct across the custom-domain cutover, which
   // an earlier version of this comment claimed. siteUrl() returns
-  // `url + sitePath(path)`, so an apex origin while the deploy is still on the
-  // project path yields `https://neurospike.org/FFC-EX-neurospike.org/...` --
-  // a URL neither host serves.
+  // `url + sitePath(path)`, so this origin and the deploy's base path have to
+  // move together: an apex origin while the deploy is still on the project
+  // path yields `https://neurospike.org/FFC-EX-neurospike.org/...`, a URL
+  // neither host serves.
   //
-  // neurospike.org is not registered as of 2026-09-12: the .org registry
-  // returns NXDOMAIN for it, so there is no zone to point at GitHub Pages and
-  // no public/CNAME can be added yet. Until it exists this site is served only
-  // at https://freeforcharity.github.io/FFC-EX-neurospike.org/, and that is
-  // what canonicals, the sitemap, robots and security.txt must advertise.
+  // CUT OVER 2026-10-01. neurospike.org was registered 2026-09-28 (Cloudflare
+  // Registrar, FFC account) and apex + www now point at GitHub Pages, so
+  // `public/CNAME` exists and .github/workflows/deploy.yml derives an EMPTY
+  // base path from its presence. Both halves moved in the same commit, which
+  // is what checkDeployOrigin in scripts/check-drift.mjs exists to require --
+  // it fails if either is done without the other.
   //
-  // TO CUT OVER, in one change: register the domain and point apex + www at
-  // GitHub Pages, add `public/CNAME` containing `neurospike.org`, set this to
-  // 'https://neurospike.org', and rerun `npm run check:drift` -- checkDeployOrigin
-  // fails if either half is done without the other.
-  url: 'https://freeforcharity.github.io',
+  // Changing this back means deleting public/CNAME in the same change.
+  url: 'https://neurospike.org',
   twitterHandle: '',
   contactEmail: 'rlee@codex.stanford.edu',
   keywords: [
